@@ -122,3 +122,59 @@ export interface Flashcard {
   back: string;
   relatedIds: string[];
 }
+
+export interface RoleplayScenario {
+  id: string;
+  title: string;
+  dynasty: string;
+  era: string;
+  persona: Persona;
+  historicalContext: string;
+  openingNarrative: string;
+  initialChoiceId: string;
+  choices: RoleplayChoice[];
+  consequences: RoleplayConsequence[];
+}
+
+export interface Persona {
+  name: string;
+  identity: string;
+  background: string;
+  constraints: string[];
+  motivations: string[];
+}
+
+export interface RoleplayChoice {
+  id: string;
+  question: string;
+  context: string;
+  options: RoleplayOption[];
+}
+
+export interface RoleplayOption {
+  id: string;
+  label: string;
+  description: string;
+  consequenceId: string;
+}
+
+export interface RoleplayConsequence {
+  id: string;
+  scenarioId: string;
+  title: string;
+  immediateImpact: string;
+  schoolTrajectory: string;
+  criticalReception: CriticalReception;
+  historicalWhatIf: string;
+  actualHistory: string;
+  relatedPainters: string[];
+  relatedSchools: string[];
+  nextChoiceId?: string;
+}
+
+export interface CriticalReception {
+  contemporary: string;
+  mingDynasty: string;
+  qingDynasty: string;
+  modern: string;
+}

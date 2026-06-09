@@ -153,3 +153,79 @@ export interface ChatOption {
   label: string;
   value: string;
 }
+
+export interface RoleplayScenario {
+  id: string;
+  title: string;
+  dynasty: string;
+  era: string;
+  persona: Persona;
+  historicalContext: string;
+  openingNarrative: string;
+  initialChoiceId: string;
+  choices: RoleplayChoice[];
+  consequences: RoleplayConsequence[];
+}
+
+export interface Persona {
+  name: string;
+  identity: string;
+  background: string;
+  constraints: string[];
+  motivations: string[];
+}
+
+export interface RoleplayChoice {
+  id: string;
+  question: string;
+  context: string;
+  options: RoleplayOption[];
+}
+
+export interface RoleplayOption {
+  id: string;
+  label: string;
+  description: string;
+  consequenceId: string;
+}
+
+export interface RoleplayConsequence {
+  id: string;
+  scenarioId: string;
+  title: string;
+  immediateImpact: string;
+  schoolTrajectory: string;
+  criticalReception: CriticalReception;
+  historicalWhatIf: string;
+  actualHistory: string;
+  relatedPainters: string[];
+  relatedSchools: string[];
+  nextChoiceId?: string;
+}
+
+export interface CriticalReception {
+  contemporary: string;
+  mingDynasty: string;
+  qingDynasty: string;
+  modern: string;
+}
+
+export interface RoleplayState {
+  scenarioId: string;
+  currentChoiceId: string;
+  history: { choiceId: string; optionId: string; consequence: RoleplayConsequence }[];
+}
+
+export interface RoleplayResult {
+  scenarioId: string;
+  path: { choiceId: string; optionId: string }[];
+  finalAssessment: FinalAssessment;
+}
+
+export interface FinalAssessment {
+  styleLabel: string;
+  schoolAffinity: string;
+  historicalPosition: string;
+  overallRating: 'master' | 'excellent' | 'good' | 'mediocre' | 'obscure';
+  summary: string;
+}

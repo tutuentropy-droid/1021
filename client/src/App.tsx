@@ -6,7 +6,8 @@ import {
   PictureOutlined,
   FileTextOutlined,
   MessageOutlined,
-  BulbOutlined
+  BulbOutlined,
+  ThunderboltOutlined
 } from '@ant-design/icons';
 import type { Stats } from './types';
 import { knowledgeApi } from './api';
@@ -16,10 +17,11 @@ import GalleryPage from './pages/GalleryPage';
 import FlashcardsPage from './pages/FlashcardsPage';
 import ChatGuidePage from './pages/ChatGuidePage';
 import TheoriesPage from './pages/TheoriesPage';
+import RoleplayPage from './pages/RoleplayPage';
 
 const { Header, Content, Sider, Footer } = Layout;
 
-type PageType = 'home' | 'tree' | 'gallery' | 'flashcards' | 'chat' | 'theories';
+type PageType = 'home' | 'tree' | 'gallery' | 'flashcards' | 'chat' | 'theories' | 'roleplay';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
@@ -39,7 +41,8 @@ function App() {
     { key: 'gallery', icon: <PictureOutlined />, label: '画作欣赏' },
     { key: 'flashcards', icon: <FileTextOutlined />, label: '知识抽认卡' },
     { key: 'chat', icon: <MessageOutlined />, label: '对话引导' },
-    { key: 'theories', icon: <BookOutlined />, label: '画论典籍' }
+    { key: 'theories', icon: <BookOutlined />, label: '画论典籍' },
+    { key: 'roleplay', icon: <ThunderboltOutlined />, label: '画史推演' }
   ];
 
   const handleNavigate = (page: string, paintingId?: string) => {
@@ -80,6 +83,8 @@ function App() {
         return <ChatGuidePage onNavigate={handleNavigate} />;
       case 'theories':
         return <TheoriesPage />;
+      case 'roleplay':
+        return <RoleplayPage />;
       default:
         return <HomePage stats={stats} onNavigate={handleNavigate} />;
     }

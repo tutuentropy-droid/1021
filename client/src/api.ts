@@ -1,6 +1,7 @@
 import axios from 'axios';
 import type {
-  Dynasty, School, Painter, Painting, Theory, Flashcard, TreeNode, Stats, KnowledgeGraph
+  Dynasty, School, Painter, Painting, Theory, Flashcard, TreeNode, Stats, KnowledgeGraph,
+  RoleplayScenario, RoleplayChoice, RoleplayConsequence, RoleplayResult
 } from './types';
 
 const api = axios.create({
@@ -36,5 +37,14 @@ export const knowledgeApi = {
   getStats: () => api.get<Stats>('/stats').then(r => r.data),
   search: (q: string) => api.get('/search', { params: { q } }).then(r => r.data),
   getKnowledgeGraph: (params?: { painterId?: string; schoolId?: string; paintingId?: string; depth?: number }) =>
-    api.get<KnowledgeGraph>('/knowledge-graph', { params: params || {} }).then(r => r.data)
+    api.get<KnowledgeGraph>('/knowledge-graph', { params: params || {} }).then(r => r.data),
+
+  getRoleplayScenarios: () => api.get<any[]>('/roleplay-scenarios').then(r => r.data),
+  getRoleplayScenario: (id: string) => api.get<RoleplayScenario>(`/roleplay-scenarios/${id}`).then(r => r.data),
+  getRoleplayChoice: (scenarioId: string, choiceId: string) =>
+    api.get<RoleplayChoice>(`/roleplay-scenarios/${scenarioId}/choices/${choiceId}`).then(r => r.data),
+  getRoleplayConsequence: (scenarioId: string, consequenceId: string) =>
+    api.get<RoleplayConsequence>(`/roleplay-scenarios/${scenarioId}/consequences/${consequenceId}`).then(r => r.data),
+  getRoleplayResult: (scenarioId: string, path: { choiceId: string; optionId: string; consequenceId: string }[]) =>
+    api.post<RoleplayResult>('/roleplay-result', { scenarioId, path }).then(r => r.data)
 };

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.flashcards = exports.theories = exports.paintings = exports.painters = exports.schools = exports.dynasties = void 0;
+exports.scenarios = exports.flashcards = exports.theories = exports.paintings = exports.painters = exports.schools = exports.dynasties = void 0;
 const dynasties_1 = require("./dynasties");
 Object.defineProperty(exports, "dynasties", { enumerable: true, get: function () { return dynasties_1.dynasties; } });
 const schools_1 = require("./schools");
@@ -13,3 +13,5 @@ const theories_1 = require("./theories");
 Object.defineProperty(exports, "theories", { enumerable: true, get: function () { return theories_1.theories; } });
 const flashcards_1 = require("./flashcards");
 Object.defineProperty(exports, "flashcards", { enumerable: true, get: function () { return flashcards_1.flashcards; } });
+const scenarios_1 = require("./scenarios");
+Object.defineProperty(exports, "scenarios", { enumerable: true, get: function () { return scenarios_1.scenarios; } });

@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { dynasties, schools, painters, paintings, theories, flashcards } from '../data';
+import { dynasties, schools, painters, paintings, theories, flashcards, scenarios } from '../data';
 import type { KnowledgeGraph, KnowledgeGraphNode, KnowledgeGraphEdge } from '../types';
 
 const router = Router();
@@ -518,5 +518,192 @@ function generateScholarlyAppreciation(painting: any): string {
   };
   return templates[painting.id] || '历代鉴赏家与学者对此画多有精到品评。明清文人题跋中屡见盛赞之词，近现代美术史论家亦从艺术风格、笔墨技法、文化内涵等多维度进行深入研究。这些学术成果不仅丰富了我们对此画的理解，也使它在艺术史中的定位更加清晰——它不仅是一件美的创造，更是中国文化精神的视觉载体。';
 }
+
+router.get('/roleplay-scenarios', (req: Request, res: Response) => {
+  const result = scenarios.map(s => ({
+    id: s.id,
+    title: s.title,
+    dynasty: s.dynasty,
+    era: s.era,
+    persona: {
+      name: s.persona.name,
+      identity: s.persona.identity,
+      background: s.persona.background
+    },
+    historicalContext: s.historicalContext,
+    openingNarrative: s.openingNarrative,
+    initialChoiceId: s.initialChoiceId
+  }));
+  res.json(result);
+});
+
+router.get('/roleplay-scenarios/:id', (req: Request, res: Response) => {
+  const scenario = scenarios.find(s => s.id === req.params.id);
+  if (!scenario) {
+    res.status(404).json({ error: '场景不存在' });
+    return;
+  }
+  res.json(scenario);
+});
+
+router.get('/roleplay-scenarios/:id/choices/:choiceId', (req: Request, res: Response) => {
+  const scenario = scenarios.find(s => s.id === req.params.id);
+  if (!scenario) {
+    res.status(404).json({ error: '场景不存在' });
+    return;
+  }
+  const choice = scenario.choices.find(c => c.id === req.params.choiceId);
+  if (!choice) {
+    res.status(404).json({ error: '选择节点不存在' });
+    return;
+  }
+  res.json(choice);
+});
+
+router.get('/roleplay-scenarios/:id/consequences/:consequenceId', (req: Request, res: Response) => {
+  const scenario = scenarios.find(s => s.id === req.params.id);
+  if (!scenario) {
+    res.status(404).json({ error: '场景不存在' });
+    return;
+  }
+  const consequence = scenario.consequences.find(c => c.id === req.params.consequenceId);
+  if (!consequence) {
+    res.status(404).json({ error: '后果节点不存在' });
+    return;
+  }
+  res.json(consequence);
+});
+
+router.post('/roleplay-result', (req: Request, res: Response) => {
+  const { scenarioId, path } = req.body;
+  const scenario = scenarios.find(s => s.id === scenarioId);
+  if (!scenario) {
+    res.status(404).json({ error: '场景不存在' });
+    return;
+  }
+
+  const lastConsequenceId = path[path.length - 1]?.consequenceId;
+  const lastConsequence = scenario.consequences.find(c => c.id === lastConsequenceId);
+
+  const consequenceIds = path.map((p: any) => p.consequenceId);
+  const allConsequences = consequenceIds
+    .map((cid: string) => scenario.consequences.find(c => c.id === cid))
+    .filter(Boolean);
+
+  let overallRating: 'master' | 'excellent' | 'good' | 'mediocre' | 'obscure' = 'good';
+  let styleLabel = '自成一家';
+  let schoolAffinity = '融合多家';
+  let historicalPosition = '在画史上留下了自己的印记';
+  let summary = '你在历史的十字路口做出了自己的选择。';
+
+  if (scenarioId === 'southern-song-court') {
+    const hasShiqi = consequenceIds.some((id: string) => id.includes('1-d') || id.includes('2-b') || id.includes('3-b'));
+    const hasXingsi = consequenceIds.some((id: string) => id.includes('3-c'));
+    const hasZhengzhi = consequenceIds.some((id: string) => id.includes('2-c'));
+    if (hasShiqi && hasXingsi) {
+      overallRating = 'master';
+      styleLabel = '士气与精工兼备，开宗立派';
+      schoolAffinity = '院体与文人画之间的桥梁人物';
+      historicalPosition = '宋元之变的关键过渡人物，开元代文人画之先河';
+      summary = '你在南宋院体与文人画之间找到了一条融合之路，既保有院体的精工法度，又具备文人的士气品格。你的选择为元代文人画的全面兴盛做了铺垫，在画史上具有承前启后的重要地位。';
+    } else if (hasShiqi) {
+      overallRating = 'excellent';
+      styleLabel = '士气盎然，别开生面';
+      schoolAffinity = '画院中的文人画先驱';
+      historicalPosition = '院体画家中的异数，为文人画传统注入了新的活力';
+      summary = '你在画院体制内坚持文人画的追求，以"士气"突破院体的束缚。这种"在朝而野"的姿态，使你成为画史上独具一格的人物。';
+    } else if (hasZhengzhi) {
+      overallRating = 'excellent';
+      styleLabel = '寄意深远，画中良史';
+      schoolAffinity = '政治寓意画的开创者';
+      historicalPosition = '中国绘画爱国主义传统的奠基人';
+      summary = '你将家国情怀融入山水画的创作，开辟了"政治寓意山水"这一新领域。你的作品不仅是艺术珍品，更是民族精神的图像表达，在后世危难时刻总能激发人们的爱国热情。';
+    } else {
+      overallRating = 'good';
+      styleLabel = '恪守传统，院体正脉';
+      schoolAffinity = '南宋院体画的中坚力量';
+      historicalPosition = '宋代写实绘画传统的重要传承者';
+      summary = '你坚守院体画的写实传统，以精湛的技法延续了宋代绘画的辉煌。虽然在文人画逐渐成为主流的历史大潮中，你的选择未必代表"正确方向"，但你对写实精神的坚守本身就具有不可替代的价值。';
+    }
+  } else if (scenarioId === 'yuan-recluse') {
+    const hasYige = consequenceIds.some((id: string) => id.includes('3-a'));
+    const hasShufa = consequenceIds.some((id: string) => id.includes('3-b'));
+    const hasXiesheng = consequenceIds.some((id: string) => id.includes('3-c'));
+    const hasJiecao = consequenceIds.some((id: string) => id.includes('2-b'));
+    if (hasYige && hasJiecao) {
+      overallRating = 'master';
+      styleLabel = '逸品圣手，处士高风';
+      schoolAffinity = '元四家之外的"第五人"';
+      historicalPosition = '文人画"逸品"美学的系统阐释者，艺术独立精神的象征';
+      summary = '你以处士的身份坚守士人气节，同时将"逸"的美学发展为系统的文人画理论。你的存在证明，艺术的独立价值不需要依附于政治或权力——真正的伟大艺术来自自由的心灵。';
+    } else if (hasShufa) {
+      overallRating = 'excellent';
+      styleLabel = '书画同源，以书入画';
+      schoolAffinity = '赵孟頫书画同源说的最重要阐发者';
+      historicalPosition = '中国绘画"书画同源"理论从哲学观念到技法体系的完成者';
+      summary = '你将"书画同源"从一句口号发展为可操作的完整技法体系，使中国绘画的形式语言获得了更深厚的书法根基。你的理论影响了此后数百年的画家。';
+    } else if (hasXiesheng) {
+      overallRating = 'excellent';
+      styleLabel = '师法自然，写生正传';
+      schoolAffinity = '写生传统在元代的复兴者';
+      historicalPosition = '中国绘画写生传统承上启下的关键人物';
+      summary = '在"摹古风"逐渐兴起的元代，你重新举起了"师法自然"的大旗。你的写生实践不仅影响了石涛等后世画家，更证明了传统山水画从未完全脱离与自然的血肉联系。';
+    } else {
+      overallRating = 'good';
+      styleLabel = '董巨正传，元派嫡脉';
+      schoolAffinity = '文人山水画主脉的重要传人';
+      historicalPosition = '元四家与明吴门画派之间的桥梁人物';
+      summary = '你沿着董源、巨然、赵孟頫、黄公望开辟的文人山水画正脉继续前行，笔力扎实，传派清晰。虽然你的独创性未必能与元四家比肩，但你对传统的忠实传承同样是画史不可或缺的一环。';
+    }
+  } else if (scenarioId === 'dong-qichang-follower') {
+    const hasRonghe = consequenceIds.some((id: string) => id.includes('1-b') || id.includes('1-d') || id.includes('2-c'));
+    const hasXiesheng = consequenceIds.some((id: string) => id.includes('1-c'));
+    const hasJiecao = consequenceIds.some((id: string) => id.includes('3-b'));
+    const hasFansi = consequenceIds.some((id: string) => id.includes('2-b'));
+    if (hasRonghe && hasFansi) {
+      overallRating = 'master';
+      styleLabel = '南北融合，突破门户';
+      schoolAffinity = '松江画派中最具独立思考精神的传人';
+      historicalPosition = '"南北宗论"最早的反思者与修正者，打破门户之见的先驱';
+      summary = '在董其昌"南北宗论"风靡天下、门户之见日深的晚明画坛，你保持了清醒的独立思考。你不仅在理论上反思"崇南贬北"的偏颇，更在创作实践中真正实现了南北融合。这种超越门户的眼光和胸襟，使你成为那个时代最具现代精神的画家。';
+    } else if (hasXiesheng && hasJiecao) {
+      overallRating = 'master';
+      styleLabel = '师法造化，遗民典型';
+      schoolAffinity = '写生传统与遗民绘画的双重代表';
+      historicalPosition = '从传统内部走出的现代性先驱，清初遗民画坛的核心人物';
+      summary = '你在摹古成风的晚明坚持"师法自然"，在明清易代之际坚守遗民气节。你的一生证明，真正的艺术家既不盲从古人，也不屈从权力——他只听从造化和良知的召唤。';
+    } else if (hasXiesheng) {
+      overallRating = 'excellent';
+      styleLabel = '师法造化，写生开先';
+      schoolAffinity = '传统写生派在晚明的复兴者';
+      historicalPosition = '中国绘画从传统走向现代的先行者';
+      summary = '当同时代人还在董其昌的"摹古"旗帜下亦步亦趋时，你已经走出画室，走向真山水。你对写生的重视，与三百年后西方印象派的户外写生遥相呼应，代表了中国绘画内部自发产生的现代性萌芽。';
+    } else if (hasJiecao) {
+      overallRating = 'excellent';
+      styleLabel = '遗民宗师，气节可风';
+      schoolAffinity = '清初遗民画派的领袖人物';
+      historicalPosition = '明遗民精神在绘画领域的杰出代表';
+      summary = '在天崩地解的易代之际，你选择了坚守。你的画不仅是笔墨的艺术，更是人格的写照——枯树残山，无不寄托着故国之思。你与"四僧"共同构成了那个黑暗时代中最耀眼的精神之光。';
+    } else {
+      overallRating = 'good';
+      styleLabel = '松江正传，摹古大家';
+      schoolAffinity = '董其昌之后松江画派的领袖';
+      historicalPosition = '连接董其昌与清初"四王"的关键人物';
+      summary = '你忠实继承了董其昌的画学思想，以"集古大成"为目标，摹古功夫极深。你的传派直接开启了清代"四王"的正统画派，成为中国绘画传统延续性的重要保障。虽然独创性稍显不足，但对传统的系统传承同样是画史的重要贡献。';
+    }
+  }
+
+  res.json({
+    scenarioId,
+    path,
+    finalAssessment: {
+      styleLabel,
+      schoolAffinity,
+      historicalPosition,
+      overallRating,
+      summary
+    }
+  });
+});
 
 export default router;
