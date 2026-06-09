@@ -1,4 +1,4 @@
-import { Card, Row, Col, Statistic, Button, Typography } from 'antd';
+import { Card, Row, Col, Statistic, Button, Typography, Empty } from 'antd';
 import {
   AppstoreOutlined,
   PictureOutlined,
@@ -13,12 +13,19 @@ import type { Stats } from '../types';
 const { Title, Paragraph } = Typography;
 
 interface HomePageProps {
-  stats: Stats;
+  stats: Stats | null;
   onNavigate: (page: string) => void;
 }
 
 function HomePage({ stats, onNavigate }: HomePageProps) {
-  if (!stats) return null;
+  if (!stats) {
+    return (
+      <Empty
+        description="数据加载失败，请确认后端服务已启动（npm run dev）"
+        style={{ marginTop: 80 }}
+      />
+    );
+  }
 
   const features = [
     {

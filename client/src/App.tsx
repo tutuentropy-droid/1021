@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Layout, Menu, Spin } from 'antd';
 import {
   BookOutlined,
@@ -23,6 +23,7 @@ type PageType = 'home' | 'tree' | 'gallery' | 'flashcards' | 'chat' | 'theories'
 
 function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
+  const [galleryPaintingId, setGalleryPaintingId] = useState<string | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -41,9 +42,16 @@ function App() {
     { key: 'theories', icon: <BookOutlined />, label: '画论典籍' }
   ];
 
-  const handleNavigate = (page: string) => {
+  const handleNavigate = (page: string, paintingId?: string) => {
     setCurrentPage(page as PageType);
+    if (page === 'gallery' && paintingId) {
+      setGalleryPaintingId(paintingId);
+    }
   };
+
+  const handleGalleryPaintingConsumed = useCallback(() => {
+    setGalleryPaintingId(null);
+  }, []);
 
   const renderPage = () => {
     if (loading && currentPage === 'home') {
@@ -56,11 +64,16 @@ function App() {
 
     switch (currentPage) {
       case 'home':
-        return <HomePage stats={stats!} onNavigate={handleNavigate} />;
+        return <HomePage stats={stats} onNavigate={handleNavigate} />;
       case 'tree':
         return <KnowledgeTree onNavigate={handleNavigate} />;
       case 'gallery':
-        return <GalleryPage />;
+        return (
+          <GalleryPage
+            initialPaintingId={galleryPaintingId}
+            onInitialPaintingConsumed={handleGalleryPaintingConsumed}
+          />
+        );
       case 'flashcards':
         return <FlashcardsPage />;
       case 'chat':
@@ -68,7 +81,7 @@ function App() {
       case 'theories':
         return <TheoriesPage />;
       default:
-        return <HomePage stats={stats!} onNavigate={handleNavigate} />;
+        return <HomePage stats={stats} onNavigate={handleNavigate} />;
     }
   };
 

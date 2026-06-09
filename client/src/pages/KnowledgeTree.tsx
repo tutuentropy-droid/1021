@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Row, Col, Tree, Card, Typography, Spin, Empty, Tag, Modal, Descriptions, List, Divider, Tabs } from 'antd';
+import { Row, Col, Tree, Card, Typography, Spin, Empty, Tag, Modal, Descriptions, List, Divider, Tabs, Button, Space } from 'antd';
+import { PictureOutlined, ReadOutlined } from '@ant-design/icons';
 import {
   EyeOutlined,
   BulbOutlined,
@@ -12,7 +13,25 @@ import { knowledgeApi } from '../api';
 const { Title, Paragraph } = Typography;
 
 interface KnowledgeTreeProps {
-  onNavigate: (page: string) => void;
+  onNavigate: (page: string, paintingId?: string) => void;
+}
+
+const THEME_ICONS: Record<string, string> = {
+  '山水': '🏔️',
+  '花鸟': '🌿',
+  '人物': '👥',
+  '风俗人物': '🎭',
+  '畜兽': '🐂',
+  '人物故事': '📖'
+};
+
+function parseNodeKey(key: string): { type: string; id: string } | null {
+  const dashIndex = key.indexOf('-');
+  if (dashIndex <= 0) return null;
+  return {
+    type: key.slice(0, dashIndex),
+    id: key.slice(dashIndex + 1)
+  };
 }
 
 function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
@@ -25,6 +44,7 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
   const [selectedData, setSelectedData] = useState<any>(null);
   const [selectedPainting, setSelectedPainting] = useState<Painting | null>(null);
   const [paintingDetailVisible, setPaintingDetailVisible] = useState(false);
+  const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -41,7 +61,7 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
       setPainters(paintersData);
       setAllPaintings(paintingsData);
       setLoading(false);
-    });
+    }).catch(() => setLoading(false));
   }, []);
 
   const convertToAntTree = (nodes: TreeNode[]): any[] => {
@@ -60,34 +80,55 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
     }));
   };
 
-  const handleSelect = (selectedKeys: React.Key[]) => {
-    if (selectedKeys.length === 0) {
-      setSelectedNode(null);
-      setSelectedData(null);
-      return;
-    }
-
-    const key = selectedKeys[0] as string;
-    const [type, id] = key.split('-');
+  const selectNode = (type: string, id: string) => {
+    setSelectedKeys([`${type}-${id}`]);
     setSelectedNode({ id, type });
+    setPaintingDetailVisible(false);
+    setSelectedPainting(null);
 
     switch (type) {
       case 'dynasty':
-        setSelectedData(dynasties.find(d => d.id === id));
+        setSelectedData(dynasties.find(d => d.id === id) || null);
         break;
       case 'school':
-        setSelectedData(schools.find(s => s.id === id));
+        setSelectedData(schools.find(s => s.id === id) || null);
         break;
       case 'painter':
-        setSelectedData(painters.find(p => p.id === id));
+        setSelectedData(painters.find(p => p.id === id) || null);
         break;
-      case 'painting':
-        const painting = allPaintings.find(p => p.id === id);
-        setSelectedPainting(painting || null);
-        setPaintingDetailVisible(true);
+      case 'painting': {
+        const painting = allPaintings.find(p => p.id === id) || null;
         setSelectedData(painting);
+        setSelectedPainting(painting);
         break;
+      }
+      default:
+        setSelectedData(null);
     }
+  };
+
+  const handleSelect = (keys: React.Key[]) => {
+    if (keys.length === 0) {
+      setSelectedKeys([]);
+      setSelectedNode(null);
+      setSelectedData(null);
+      setSelectedPainting(null);
+      setPaintingDetailVisible(false);
+      return;
+    }
+
+    const parsed = parseNodeKey(keys[0] as string);
+    if (!parsed) return;
+    selectNode(parsed.type, parsed.id);
+  };
+
+  const openPaintingAnalysis = (painting: Painting) => {
+    setSelectedPainting(painting);
+    setPaintingDetailVisible(true);
+  };
+
+  const goToGallery = (paintingId: string) => {
+    onNavigate('gallery', paintingId);
   };
 
   const renderAnalysisTab = (analysis: any) => {
@@ -143,15 +184,6 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
       painting: '画作'
     };
 
-    const THEME_ICONS: Record<string, string> = {
-      '山水': '🏔️',
-      '花鸟': '🌿',
-      '人物': '👥',
-      '风俗人物': '🎭',
-      '畜兽': '🐂',
-      '人物故事': '📖'
-    };
-
     const getPainterName = (painterId: string) => {
       return painters.find(p => p.id === painterId)?.name || '佚名';
     };
@@ -160,11 +192,15 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
       return dynasties.find(d => d.id === dynastyId)?.name || '';
     };
 
+    const displayTitle = selectedNode.type === 'painting'
+      ? selectedData.title
+      : selectedData.name;
+
     return (
       <Card className="card-shadow" style={{ borderRadius: 16 }}>
         <Tag color="#8b7355" style={{ marginBottom: 12 }}>{typeLabels[selectedNode.type]}</Tag>
         <Title level={2} className="ink-title" style={{ color: '#5c4a33' }}>
-          {selectedData.name}
+          {displayTitle}
         </Title>
 
         {selectedNode.type === 'dynasty' && (
@@ -234,9 +270,26 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
             <Title level={4} className="ink-title" style={{ marginTop: 16, color: '#5c4a33' }}>
               代表作品
             </Title>
-            <Paragraph style={{ color: '#6b5b45' }}>
-              {selectedData.famousWorks?.join('、')}
-            </Paragraph>
+            <Space wrap style={{ marginBottom: 8 }}>
+              {allPaintings
+                .filter(p => p.painterId === selectedData.id)
+                .map(painting => (
+                  <Button
+                    key={painting.id}
+                    type="link"
+                    size="small"
+                    style={{ color: '#8b7355', padding: 0 }}
+                    onClick={() => selectNode('painting', painting.id)}
+                  >
+                    🖼️ {painting.title}
+                  </Button>
+                ))}
+            </Space>
+            {allPaintings.filter(p => p.painterId === selectedData.id).length === 0 && (
+              <Paragraph style={{ color: '#6b5b45' }}>
+                {selectedData.famousWorks?.join('、')}
+              </Paragraph>
+            )}
             {selectedData.anecdotes && selectedData.anecdotes.length > 0 && (
               <>
                 <Title level={4} className="ink-title" style={{ marginTop: 16, color: '#5c4a33' }}>
@@ -257,6 +310,7 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
             <img
               src={selectedData.imageUrl}
               alt={selectedData.title}
+              referrerPolicy="no-referrer"
               style={{
                 width: '100%',
                 maxHeight: 300,
@@ -265,23 +319,55 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
                 marginBottom: 20,
                 backgroundColor: '#f8f5ee'
               }}
-              onError={(e) => { e.currentTarget.style.display = 'none' }}
             />
             <Descriptions column={2} size="small" style={{ marginBottom: 16 }}>
               <Descriptions.Item label="朝代">{getDynastyName(selectedData.dynastyId)}</Descriptions.Item>
-              <Descriptions.Item label="作者">{getPainterName(selectedData.painterId)}</Descriptions.Item>
+              <Descriptions.Item label="作者">
+                <Button
+                  type="link"
+                  size="small"
+                  style={{ padding: 0, height: 'auto' }}
+                  onClick={() => selectNode('painter', selectedData.painterId)}
+                >
+                  {getPainterName(selectedData.painterId)}
+                </Button>
+              </Descriptions.Item>
               <Descriptions.Item label="创作年代">{selectedData.year || '不详'}</Descriptions.Item>
               <Descriptions.Item label="题材">{THEME_ICONS[selectedData.theme]} {selectedData.theme}</Descriptions.Item>
               <Descriptions.Item label="形制">{selectedData.format}</Descriptions.Item>
               <Descriptions.Item label="尺寸">{selectedData.dimensions || '不详'}</Descriptions.Item>
               <Descriptions.Item label="收藏地" span={2}>{selectedData.collection}</Descriptions.Item>
             </Descriptions>
+            <Title level={4} className="ink-title" style={{ color: '#5c4a33' }}>
+              整体印象
+            </Title>
+            <Paragraph style={{ color: '#6b5b45', lineHeight: 1.8 }}>
+              {selectedData.analysis?.overallImpression}
+            </Paragraph>
+            <Space style={{ marginTop: 16 }}>
+              <Button
+                type="primary"
+                icon={<ReadOutlined />}
+                onClick={() => openPaintingAnalysis(selectedData)}
+                style={{ background: '#8b7355', borderColor: '#8b7355' }}
+              >
+                查看深度赏析
+              </Button>
+              <Button
+                icon={<PictureOutlined />}
+                onClick={() => goToGallery(selectedData.id)}
+              >
+                前往画作欣赏
+              </Button>
+            </Space>
           </>
         )}
 
-        <Paragraph style={{ color: '#6b5b45' }}>
-          {selectedData.description}
-        </Paragraph>
+        {selectedNode.type !== 'painting' && selectedData.description && (
+          <Paragraph style={{ color: '#6b5b45' }}>
+            {selectedData.description}
+          </Paragraph>
+        )}
       </Card>
     );
   };
@@ -293,15 +379,6 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
       </div>
     );
   }
-
-  const THEME_ICONS_MODAL: Record<string, string> = {
-    '山水': '🏔️',
-    '花鸟': '🌿',
-    '人物': '👥',
-    '风俗人物': '🎭',
-    '畜兽': '🐂',
-    '人物故事': '📖'
-  };
 
   const getPainterNameModal = (painterId: string) => {
     return painters.find(p => p.id === painterId)?.name || '佚名';
@@ -332,6 +409,7 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
               treeData={convertToAntTree(tree)}
               defaultExpandAll={false}
               expandedKeys={tree.map(t => `dynasty-${t.id}`)}
+              selectedKeys={selectedKeys}
               onSelect={handleSelect}
               blockNode
             />
@@ -354,6 +432,7 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
             <img
               src={selectedPainting.imageUrl}
               alt={selectedPainting.title}
+              referrerPolicy="no-referrer"
               style={{
                 width: '100%',
                 maxHeight: 350,
@@ -362,7 +441,6 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
                 marginBottom: 20,
                 backgroundColor: '#f8f5ee'
               }}
-              onError={(e) => { e.currentTarget.style.display = 'none' }}
             />
 
             <Title level={2} className="ink-title" style={{ color: '#5c4a33', marginTop: 0 }}>
@@ -373,7 +451,7 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
               <Descriptions.Item label="朝代">{getDynastyNameModal(selectedPainting.dynastyId)}</Descriptions.Item>
               <Descriptions.Item label="作者">{getPainterNameModal(selectedPainting.painterId)}</Descriptions.Item>
               <Descriptions.Item label="创作年代">{selectedPainting.year || '不详'}</Descriptions.Item>
-              <Descriptions.Item label="题材">{THEME_ICONS_MODAL[selectedPainting.theme]} {selectedPainting.theme}</Descriptions.Item>
+              <Descriptions.Item label="题材">{THEME_ICONS[selectedPainting.theme]} {selectedPainting.theme}</Descriptions.Item>
               <Descriptions.Item label="形制">{selectedPainting.format}</Descriptions.Item>
               <Descriptions.Item label="尺寸">{selectedPainting.dimensions || '不详'}</Descriptions.Item>
               <Descriptions.Item label="收藏地" span={2}>{selectedPainting.collection}</Descriptions.Item>
@@ -423,6 +501,20 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
                 />
               </>
             )}
+
+            <div style={{ marginTop: 24, textAlign: 'center' }}>
+              <Button
+                type="primary"
+                icon={<PictureOutlined />}
+                onClick={() => {
+                  setPaintingDetailVisible(false);
+                  goToGallery(selectedPainting.id);
+                }}
+                style={{ background: '#8b7355', borderColor: '#8b7355' }}
+              >
+                在画作欣赏中打开
+              </Button>
+            </div>
           </div>
         )}
       </Modal>

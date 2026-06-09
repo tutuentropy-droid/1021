@@ -11,7 +11,7 @@ export const paintings: Painting[] = [
     format: '纸本水墨长卷',
     dimensions: '前段31.8×51.4cm，后段33×636.9cm',
     collection: '前段藏浙江省博物馆，后段藏台北故宫博物院',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Dwelling_in_the_Fuchun_Mountains.jpg/1280px-Dwelling_in_the_Fuchun_Mountains.jpg',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Dwelling_in_the_Fuchun_Mountains_%28first_half%29.JPG/960px-Dwelling_in_the_Fuchun_Mountains_%28first_half%29.JPG',
     imagePrompt: 'traditional Chinese ink wash landscape painting, Yuan Dynasty style, Fuchun Mountains scenery, long horizontal scroll, layered mountains and rivers, pine trees, fishing boats, hermits, misty atmosphere, black ink on rice paper',
     theme: '山水',
     analysis: {
@@ -44,7 +44,7 @@ export const paintings: Painting[] = [
     format: '绢本设色长卷',
     dimensions: '24.8×528.7cm',
     collection: '北京故宫博物院',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Along_the_River_During_the_Qingming_Festival_%28full%29.png/1280px-Along_the_River_During_the_Qingming_Festival_%28full%29.png',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Along_the_River_During_the_Qingming_festival.jpg/960px-Along_the_River_During_the_Qingming_festival.jpg',
     imagePrompt: 'traditional Chinese Song Dynasty painting, Along the River During Qingming Festival, long horizontal scroll, bustling street scene, ancient Chinese city Kaifeng, wooden bridge, crowds of people, shops, boats on river, detailed figure painting, ink and color on silk',
     theme: '风俗人物',
     analysis: {
@@ -77,7 +77,7 @@ export const paintings: Painting[] = [
     format: '绢本水墨立轴',
     dimensions: '206.3×103.3cm',
     collection: '台北故宫博物院',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Fan_Kuan_-_Travelers_Among_Mountains_and_Streams_-_Google_Art_Project.jpg/800px-Fan_Kuan_-_Travelers_Among_Mountains_and_Streams_-_Google_Art_Project.jpg',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Fan_Kuan_-_Travelers_Among_Mountains_and_Streams_-_Google_Art_Project.jpg/960px-Fan_Kuan_-_Travelers_Among_Mountains_and_Streams_-_Google_Art_Project.jpg',
     imagePrompt: 'traditional Chinese Northern Song Dynasty landscape painting, Travelers Among Mountains and Streams, towering massive mountain dominating composition, small waterfall, tiny travelers with donkeys on winding path, pine trees, monumental landscape, black ink on silk, Fan Kuan style',
     theme: '山水',
     analysis: {
@@ -110,7 +110,7 @@ export const paintings: Painting[] = [
     format: '绢本设色长卷',
     dimensions: '28.7×335.5cm',
     collection: '北京故宫博物院',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/The_Night_Revels_of_Han_Xizai.jpg/1280px-The_Night_Revels_of_Han_Xizai.jpg',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Gu_Hongzhong%27s_Night_Revels_1_complete_scene.jpg/960px-Gu_Hongzhong%27s_Night_Revels_1_complete_scene.jpg',
     imagePrompt: 'traditional Chinese Five Dynasties painting, Night Revels of Han Xizai, long horizontal scroll, night banquet scene, aristocratic figures, musicians playing pipa, dancers, elegant interior, candlelight, detailed silk clothing, ink and color on silk, Gu Hongzhong style',
     theme: '人物',
     analysis: {
@@ -143,7 +143,7 @@ export const paintings: Painting[] = [
     format: '绢本青绿设色长卷',
     dimensions: '51.5×1191.5cm',
     collection: '北京故宫博物院',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/One_Thousand_Li_of_Rivers_and_Mountains.jpg/1280px-One_Thousand_Li_of_Rivers_and_Mountains.jpg',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Wang_Ximeng._A_Thousand_Li_of_Rivers_and_Mountains._%28Complete%2C_51%2C3x1191%2C5_cm%29._1113._Palace_museum%2C_Beijing.jpg/960px-Wang_Ximeng._A_Thousand_Li_of_Rivers_and_Mountains._%28Complete%2C_51%2C3x1191%2C5_cm%29._1113._Palace_museum%2C_Beijing.jpg',
     imagePrompt: 'traditional Chinese Northern Song Dynasty blue-green landscape painting, A Thousand Miles of Rivers and Mountains, long horizontal scroll, magnificent mountains and rivers, turquoise and blue mineral colors, pavilions, bridges, fishing boats, villages, grand panoramic view, Wang Ximeng style, extremely detailed',
     theme: '山水',
     analysis: {
@@ -176,7 +176,7 @@ export const paintings: Painting[] = [
     format: '绢本设色长卷',
     dimensions: '27.1×572.8cm',
     collection: '北京故宫博物院等（存宋摹本多卷）',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/The_Nymph_of_the_Luo_River.jpg/1280px-The_Nymph_of_the_Luo_River.jpg',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Gu_Kaizhi_river_Lo.jpg/960px-Gu_Kaizhi_river_Lo.jpg',
     imagePrompt: 'traditional Chinese Eastern Jin Dynasty painting, Nymph of the Luo River, long horizontal scroll, narrative scene, elegant scholar meeting river goddess, romantic atmosphere, flowing silk robes, ancient Chinese mythology, willow trees, river, Gu Kaizhi style, ink and color on silk',
     theme: '人物故事',
     analysis: {
@@ -209,7 +209,7 @@ export const paintings: Painting[] = [
     format: '麻纸设色长卷',
     dimensions: '20.8×139.8cm',
     collection: '北京故宫博物院',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Five_Oxen.jpg/1280px-Five_Oxen.jpg',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Five_Oxen.jpg/960px-Five_Oxen.jpg',
     imagePrompt: 'traditional Chinese Tang Dynasty painting, Five Oxen, long horizontal scroll, five individual oxen portraits, detailed realistic depiction, each ox with different pose and expression, sturdy robust animals, ancient Chinese paper painting, Han Huang style',
     theme: '畜兽',
     analysis: {
@@ -242,7 +242,7 @@ export const paintings: Painting[] = [
     format: '纸本水墨立轴',
     dimensions: '165.4×64.5cm',
     collection: '北京故宫博物院',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Xu_Wei_-_Grapes.jpg/800px-Xu_Wei_-_Grapes.jpg',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/41/Xu_Wei_Grapes.jpg',
     imagePrompt: 'traditional Chinese Ming Dynasty freehand ink painting, Ink Grapes, Xu Wei style, expressive splashed ink technique, hanging scroll, bold abstract calligraphic brushstrokes, grape vines with leaves and fruit, poetic inscription on upper part, black ink on rice paper, highly expressive',
     theme: '花鸟',
     analysis: {
@@ -275,7 +275,7 @@ export const paintings: Painting[] = [
     format: '纸本水墨立轴',
     dimensions: '114.4×38.5cm',
     collection: '北京故宫博物院',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Bada_Shanren_-_Lotus_and_Ducks.jpg/800px-Bada_Shanren_-_Lotus_and_Ducks.jpg',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Bada_Shanren_-_Lotus_and_Ducks_-_Google_Art_Project.jpg/960px-Bada_Shanren_-_Lotus_and_Ducks_-_Google_Art_Project.jpg',
     imagePrompt: 'traditional Chinese early Qing Dynasty ink painting, Bada Shanren style, lotus and waterfowl, minimal composition, lonely duck with白眼 white eyes showing disdain, sparse lotus leaves, rocks, extremely minimalist, expressive empty space, odd composition, Zhu Da',
     theme: '花鸟',
     analysis: {
@@ -308,7 +308,7 @@ export const paintings: Painting[] = [
     format: '绢本水墨淡设色立轴',
     dimensions: '158.3×108.1cm',
     collection: '台北故宫博物院',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Guo_Xi_-_Early_Spring.jpg/800px-Guo_Xi_-_Early_Spring.jpg',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/80/Guo_Xi_-_Early_Spring.jpg',
     imagePrompt: 'traditional Chinese Northern Song Dynasty landscape painting, Early Spring, Guo Xi style, towering mountains with layered peaks, winding streams, pine trees, travelers, misty atmosphere, cloud-like rock formations, 卷云皴, ink with light color on silk, monumental composition',
     theme: '山水',
     analysis: {

@@ -25,7 +25,12 @@ const THEME_ICONS: Record<string, string> = {
   '人物故事': '📖'
 };
 
-function GalleryPage() {
+interface GalleryPageProps {
+  initialPaintingId?: string | null;
+  onInitialPaintingConsumed?: () => void;
+}
+
+function GalleryPage({ initialPaintingId, onInitialPaintingConsumed }: GalleryPageProps) {
   const [paintings, setPaintings] = useState<Painting[]>([]);
   const [dynasties, setDynasties] = useState<Dynasty[]>([]);
   const [painters, setPainters] = useState<Painter[]>([]);
@@ -50,6 +55,17 @@ function GalleryPage() {
   useEffect(() => {
     knowledgeApi.getPaintings(filters).then(setPaintings);
   }, [filters]);
+
+  useEffect(() => {
+    if (!loading && initialPaintingId && paintings.length > 0) {
+      const painting = paintings.find(p => p.id === initialPaintingId);
+      if (painting) {
+        setSelectedPainting(painting);
+        setModalVisible(true);
+        onInitialPaintingConsumed?.();
+      }
+    }
+  }, [loading, initialPaintingId, paintings, onInitialPaintingConsumed]);
 
   const themes = Array.from(new Set(paintings.map(p => p.theme)));
 
@@ -167,7 +183,7 @@ function GalleryPage() {
                 style={{ borderRadius: 16, height: '100%' }}
                 onClick={() => openPaintingDetail(painting)}
                 cover={
-                  <img src={painting.imageUrl} alt={painting.title} style={{ width: '100%', height: 220, objectFit: 'cover', borderTopLeftRadius: 16, borderTopRightRadius: 16 }} onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                  <img src={painting.imageUrl} alt={painting.title} referrerPolicy="no-referrer" style={{ width: '100%', height: 220, objectFit: 'cover', borderTopLeftRadius: 16, borderTopRightRadius: 16, backgroundColor: '#f8f5ee' }} />
                 }
               >
                 <Card.Meta
@@ -206,7 +222,7 @@ function GalleryPage() {
       >
         {selectedPainting && (
           <div>
-            <img src={selectedPainting.imageUrl} alt={selectedPainting.title} style={{ width: '100%', maxHeight: 350, objectFit: 'contain', borderRadius: 12, marginBottom: 20, backgroundColor: '#f8f5ee' }} onError={(e) => { e.currentTarget.style.display = 'none' }} />
+            <img src={selectedPainting.imageUrl} alt={selectedPainting.title} referrerPolicy="no-referrer" style={{ width: '100%', maxHeight: 350, objectFit: 'contain', borderRadius: 12, marginBottom: 20, backgroundColor: '#f8f5ee' }} />
 
             <Title level={2} className="ink-title" style={{ color: '#5c4a33', marginTop: 0 }}>
               {selectedPainting.title}
