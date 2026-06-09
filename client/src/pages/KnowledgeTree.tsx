@@ -8,13 +8,29 @@ import {
   InfoCircleOutlined,
   HighlightOutlined,
   AppstoreOutlined,
-  TeamOutlined
+  TeamOutlined,
+  BookOutlined,
+  LinkOutlined
 } from '@ant-design/icons';
-import type { TreeNode, Dynasty, School, Painter, Painting } from '../types';
+import type { TreeNode, Dynasty, School, Painter, Painting, ReadingRecommendation, ReadingCategory } from '../types';
 import { knowledgeApi } from '../api';
 import KnowledgeGraph from '../components/KnowledgeGraph';
 
 const { Title, Paragraph, Text } = Typography;
+
+const CATEGORY_LABELS: Record<ReadingCategory, string> = {
+  classic: '📜 经典画论',
+  academic: '📘 现代学术',
+  documentary: '🎬 纪录片',
+  exhibition: '🏛️ 线上展览'
+};
+
+const CATEGORY_COLORS: Record<ReadingCategory, string> = {
+  classic: '#8b4513',
+  academic: '#2c5282',
+  documentary: '#c0392b',
+  exhibition: '#27ae60'
+};
 
 interface KnowledgeTreeProps {
   onNavigate: (page: string, paintingId?: string) => void;
@@ -52,6 +68,8 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
   const [graphSource, setGraphSource] = useState<{ type: string; id: string } | null>(null);
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
   const [loading, setLoading] = useState(true);
+  const [readingRecommendation, setReadingRecommendation] = useState<ReadingRecommendation | null>(null);
+  const [readingLoading, setReadingLoading] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -69,6 +87,17 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    const params = selectedNode
+      ? { contextType: selectedNode.type as 'dynasty' | 'school' | 'painter' | 'painting', contextId: selectedNode.id }
+      : undefined;
+    setReadingLoading(true);
+    knowledgeApi.getReadingRecommendations(params)
+      .then(data => setReadingRecommendation(data))
+      .catch(() => setReadingRecommendation(null))
+      .finally(() => setReadingLoading(false));
+  }, [selectedNode]);
 
   const convertToAntTree = (nodes: TreeNode[]): any[] => {
     return nodes.map(node => ({
@@ -472,6 +501,146 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
     );
   };
 
+  const renderReadingList = () => {
+    if (readingLoading) {
+      return (
+        <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}>
+          <Spin tip="正在为你精选延伸读物..." />
+        </div>
+      );
+    }
+
+    if (!readingRecommendation || readingRecommendation.items.length === 0) {
+      return null;
+    }
+
+    const { items, intro } = readingRecommendation;
+
+    return (
+      <Card
+        className="card-shadow"
+        style={{ borderRadius: 16, marginTop: 24 }}
+        title={
+          <span style={{ color: '#5c4a33' }}>
+            <BookOutlined style={{ marginRight: 8 }} />
+            卧游书单
+            <Tag color="#c0392b" style={{ marginLeft: 12, fontSize: 12 }}>
+              AI 导师推荐
+            </Tag>
+          </span>
+        }
+      >
+        <Paragraph style={{ color: '#6b5b45', marginBottom: 20, padding: '12px 16px', background: '#faf6ee', borderRadius: 8, borderLeft: '3px solid #8b7355' }}>
+          <span style={{ fontSize: 18, marginRight: 6 }}>💡</span>
+          {intro}
+        </Paragraph>
+
+        <List
+          grid={{ gutter: 16, xs: 1, sm: 1, md: 2, lg: 2, xl: 3 }}
+          dataSource={items}
+          renderItem={(item) => (
+            <List.Item>
+              <Card
+                hoverable
+                style={{
+                  borderRadius: 12,
+                  height: '100%',
+                  border: '1px solid #e8dcc8',
+                  background: 'linear-gradient(135deg, #fffef8 0%, #faf6ee 100%)'
+                }}
+                bodyStyle={{ padding: 16 }}
+              >
+                <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: 12 }}>
+                  <div
+                    style={{
+                      fontSize: 36,
+                      marginRight: 12,
+                      padding: '8px 12px',
+                      background: '#f5ede0',
+                      borderRadius: 8
+                    }}
+                  >
+                    {item.coverEmoji}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <Tag
+                      style={{
+                        marginBottom: 8,
+                        background: CATEGORY_COLORS[item.category],
+                        color: '#fff',
+                        border: 'none',
+                        fontSize: 11
+                      }}
+                    >
+                      {CATEGORY_LABELS[item.category]}
+                    </Tag>
+                    <Title
+                      level={4}
+                      className="ink-title"
+                      style={{
+                        color: '#5c4a33',
+                        margin: 0,
+                        fontSize: 16,
+                        lineHeight: 1.4
+                      }}
+                    >
+                      {item.title}
+                    </Title>
+                    {item.author && (
+                      <Text style={{ color: '#8b7355', fontSize: 13 }}>
+                        {item.author} {item.dynasty && `· ${item.dynasty}`}
+                      </Text>
+                    )}
+                  </div>
+                </div>
+
+                <Paragraph
+                  style={{
+                    color: '#6b5b45',
+                    fontSize: 13,
+                    lineHeight: 1.7,
+                    marginBottom: 12
+                  }}
+                >
+                  {item.description}
+                </Paragraph>
+
+                <div
+                  style={{
+                    padding: '10px 12px',
+                    background: '#faf0e0',
+                    borderRadius: 8,
+                    borderLeft: '3px solid #c0392b'
+                  }}
+                >
+                  <Text style={{ color: '#c0392b', fontWeight: 'bold', fontSize: 13 }}>
+                    📖 为什么你接下来应该读这本：
+                  </Text>
+                  <Paragraph style={{ color: '#5c4a33', fontSize: 13, lineHeight: 1.7, margin: '6px 0 0 0' }}>
+                    {item.whyRead}
+                  </Paragraph>
+                </div>
+
+                {item.sourceUrl && (
+                  <Button
+                    type="link"
+                    icon={<LinkOutlined />}
+                    href={item.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: '#8b7355', padding: 0, marginTop: 12 }}
+                  >
+                    前往探索
+                  </Button>
+                )}
+              </Card>
+            </List.Item>
+          )}
+        />
+      </Card>
+    );
+  };
+
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', padding: 100 }}>
@@ -519,6 +688,8 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
           {renderDetail()}
         </Col>
       </Row>
+
+      {renderReadingList()}
 
       <Modal
         open={paintingDetailVisible}

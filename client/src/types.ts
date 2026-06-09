@@ -229,3 +229,27 @@ export interface FinalAssessment {
   overallRating: 'master' | 'excellent' | 'good' | 'mediocre' | 'obscure';
   summary: string;
 }
+
+export type ReadingCategory = 'classic' | 'academic' | 'documentary' | 'exhibition';
+
+export interface ReadingItem {
+  id: string;
+  title: string;
+  author?: string;
+  category: ReadingCategory;
+  dynasty?: string;
+  relatedPainterIds?: string[];
+  relatedDynastyIds?: string[];
+  relatedSchoolIds?: string[];
+  description: string;
+  whyRead: string;
+  coverEmoji: string;
+  sourceUrl?: string;
+}
+
+export interface ReadingRecommendation {
+  contextType: 'dynasty' | 'school' | 'painter' | 'painting' | 'general';
+  contextName: string;
+  items: ReadingItem[];
+  intro: string;
+}

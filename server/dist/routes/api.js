@@ -674,4 +674,82 @@ router.post('/roleplay-result', (req, res) => {
         }
     });
 });
+router.get('/reading-recommendations', (req, res) => {
+    const { contextType, contextId } = req.query;
+    let items = [];
+    let contextName = '中国画';
+    let type = 'general';
+    if (contextType === 'painter' && contextId) {
+        const painter = data_1.painters.find(p => p.id === contextId);
+        if (painter) {
+            contextName = painter.name;
+            type = 'painter';
+            items = data_1.readings.filter(r => r.relatedPainterIds?.includes(contextId) ||
+                r.relatedDynastyIds?.includes(painter.dynastyId) ||
+                painter.schoolIds.some(sid => r.relatedSchoolIds?.includes(sid)));
+            if (items.length < 4) {
+                const extra = data_1.readings.filter(r => !items.includes(r)).slice(0, 4 - items.length);
+                items = [...items, ...extra];
+            }
+        }
+    }
+    else if (contextType === 'dynasty' && contextId) {
+        const dynasty = data_1.dynasties.find(d => d.id === contextId);
+        if (dynasty) {
+            contextName = dynasty.name;
+            type = 'dynasty';
+            items = data_1.readings.filter(r => r.relatedDynastyIds?.includes(contextId));
+            if (items.length < 4) {
+                const extra = data_1.readings.filter(r => !items.includes(r)).slice(0, 4 - items.length);
+                items = [...items, ...extra];
+            }
+        }
+    }
+    else if (contextType === 'school' && contextId) {
+        const school = data_1.schools.find(s => s.id === contextId);
+        if (school) {
+            contextName = school.name;
+            type = 'school';
+            items = data_1.readings.filter(r => r.relatedSchoolIds?.includes(contextId) ||
+                r.relatedDynastyIds?.includes(school.dynastyId));
+            if (items.length < 4) {
+                const extra = data_1.readings.filter(r => !items.includes(r)).slice(0, 4 - items.length);
+                items = [...items, ...extra];
+            }
+        }
+    }
+    else if (contextType === 'painting' && contextId) {
+        const painting = data_1.paintings.find(p => p.id === contextId);
+        if (painting) {
+            const painter = data_1.painters.find(p => p.id === painting.painterId);
+            contextName = painting.title;
+            type = 'painting';
+            items = data_1.readings.filter(r => r.relatedPainterIds?.includes(painting.painterId) ||
+                r.relatedDynastyIds?.includes(painting.dynastyId) ||
+                painting.schoolIds.some(sid => r.relatedSchoolIds?.includes(sid)));
+            if (items.length < 4) {
+                const extra = data_1.readings.filter(r => !items.includes(r)).slice(0, 4 - items.length);
+                items = [...items, ...extra];
+            }
+        }
+    }
+    if (items.length === 0) {
+        items = data_1.readings.slice(0, 6);
+    }
+    items = items.sort(() => Math.random() - 0.5).slice(0, 6);
+    const introByType = {
+        painter: `你正在深入了解${contextName}的艺术世界。基于你对这位画家的兴趣，我为你精选了以下延伸读物，帮助你更全面地理解他的艺术思想与历史地位。`,
+        dynasty: `你正在探索${contextName}的绘画艺术。这个时代诞生了无数不朽名作与理论典籍，以下延伸阅读将带你走进那个时代的文化语境。`,
+        school: `你正在研究${contextName}的艺术主张。每一个画派的背后都有深厚的理论根基与时代背景，以下读物将帮助你理解这个画派的来龙去脉。`,
+        painting: `你正在欣赏《${contextName}》。一幅伟大的画作背后，往往承载着画家的思想、时代的精神与千年的传承。以下读物将带你领略画外之音。`,
+        general: `中国画的世界博大精深，从经典画论到现代研究，从纪录片到线上展览，这里为你精选了最值得探索的进阶之路。`
+    };
+    const recommendation = {
+        contextType: type,
+        contextName,
+        items,
+        intro: introByType[type] || introByType.general
+    };
+    res.json(recommendation);
+});
 exports.default = router;

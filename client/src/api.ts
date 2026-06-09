@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type {
   Dynasty, School, Painter, Painting, Theory, Flashcard, TreeNode, Stats, KnowledgeGraph,
-  RoleplayScenario, RoleplayChoice, RoleplayConsequence, RoleplayResult
+  RoleplayScenario, RoleplayChoice, RoleplayConsequence, RoleplayResult, ReadingRecommendation
 } from './types';
 
 const api = axios.create({
@@ -46,5 +46,8 @@ export const knowledgeApi = {
   getRoleplayConsequence: (scenarioId: string, consequenceId: string) =>
     api.get<RoleplayConsequence>(`/roleplay-scenarios/${scenarioId}/consequences/${consequenceId}`).then(r => r.data),
   getRoleplayResult: (scenarioId: string, path: { choiceId: string; optionId: string; consequenceId: string }[]) =>
-    api.post<RoleplayResult>('/roleplay-result', { scenarioId, path }).then(r => r.data)
+    api.post<RoleplayResult>('/roleplay-result', { scenarioId, path }).then(r => r.data),
+
+  getReadingRecommendations: (params?: { contextType?: 'dynasty' | 'school' | 'painter' | 'painting'; contextId?: string }) =>
+    api.get<ReadingRecommendation>('/reading-recommendations', { params: params || {} }).then(r => r.data)
 };
