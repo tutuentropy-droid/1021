@@ -43,6 +43,7 @@ export interface Painting {
   format: string;
   dimensions?: string;
   collection: string;
+  imageUrl: string;
   imagePrompt: string;
   theme: string;
   analysis: PaintingAnalysis;

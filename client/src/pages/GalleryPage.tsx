@@ -167,9 +167,7 @@ function GalleryPage() {
                 style={{ borderRadius: 16, height: '100%' }}
                 onClick={() => openPaintingDetail(painting)}
                 cover={
-                  <div className="painting-image-placeholder">
-                    🖼️
-                  </div>
+                  <img src={painting.imageUrl} alt={painting.title} style={{ width: '100%', height: 220, objectFit: 'cover', borderTopLeftRadius: 16, borderTopRightRadius: 16 }} onError={(e) => { e.currentTarget.style.display = 'none' }} />
                 }
               >
                 <Card.Meta
@@ -208,9 +206,7 @@ function GalleryPage() {
       >
         {selectedPainting && (
           <div>
-            <div className="painting-image-placeholder" style={{ height: 200 }}>
-              🖼️ {selectedPainting.title}
-            </div>
+            <img src={selectedPainting.imageUrl} alt={selectedPainting.title} style={{ width: '100%', maxHeight: 350, objectFit: 'contain', borderRadius: 12, marginBottom: 20, backgroundColor: '#f8f5ee' }} onError={(e) => { e.currentTarget.style.display = 'none' }} />
 
             <Title level={2} className="ink-title" style={{ color: '#5c4a33', marginTop: 0 }}>
               {selectedPainting.title}
