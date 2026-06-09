@@ -1,17 +1,23 @@
 import { useState, useEffect } from 'react';
 import {
   Row, Col, Card, Typography, Spin, Select, Tag, Modal,
-  Descriptions, List, Divider, Avatar, Empty, Tabs, Button
+  Descriptions, List, Divider, Avatar, Empty, Tabs, Button, Space, Tooltip, Breadcrumb
 } from 'antd';
 import {
   EyeOutlined,
   BulbOutlined,
-  MessageOutlined,
   InfoCircleOutlined,
-  HighlightOutlined
+  HighlightOutlined,
+  HistoryOutlined,
+  ReadOutlined,
+  StarOutlined,
+  ShareAltOutlined,
+  AppstoreOutlined,
+  PictureOutlined
 } from '@ant-design/icons';
-import type { Painting, Dynasty, Painter } from '../types';
+import type { Painting, Dynasty, Painter, SealInscription } from '../types';
 import { knowledgeApi } from '../api';
+import KnowledgeGraph from '../components/KnowledgeGraph';
 
 const { Title, Paragraph, Text } = Typography;
 const { Option } = Select;
@@ -38,6 +44,9 @@ function GalleryPage({ initialPaintingId, onInitialPaintingConsumed }: GalleryPa
   const [selectedPainting, setSelectedPainting] = useState<Painting | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [filters, setFilters] = useState<{ dynastyId?: string; theme?: string }>({});
+  const [deepAnalysis, setDeepAnalysis] = useState<any>(null);
+  const [analysisLoading, setAnalysisLoading] = useState(false);
+  const [activeModalTab, setActiveModalTab] = useState('analysis');
 
   useEffect(() => {
     Promise.all([
@@ -62,6 +71,7 @@ function GalleryPage({ initialPaintingId, onInitialPaintingConsumed }: GalleryPa
       if (painting) {
         setSelectedPainting(painting);
         setModalVisible(true);
+        loadDeepAnalysis(initialPaintingId);
         onInitialPaintingConsumed?.();
       }
     }
@@ -77,6 +87,18 @@ function GalleryPage({ initialPaintingId, onInitialPaintingConsumed }: GalleryPa
     return dynasties.find(d => d.id === dynastyId)?.name || '';
   };
 
+  const loadDeepAnalysis = async (paintingId: string) => {
+    setAnalysisLoading(true);
+    try {
+      const data = await knowledgeApi.getPaintingDeepAnalysis(paintingId);
+      setDeepAnalysis(data.deepAnalysis);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setAnalysisLoading(false);
+    }
+  };
+
   const filteredPaintings = paintings.filter(p => {
     if (filters.dynastyId && p.dynastyId !== filters.dynastyId) return false;
     if (filters.theme && p.theme !== filters.theme) return false;
@@ -86,21 +108,100 @@ function GalleryPage({ initialPaintingId, onInitialPaintingConsumed }: GalleryPa
   const openPaintingDetail = (painting: Painting) => {
     setSelectedPainting(painting);
     setModalVisible(true);
+    setActiveModalTab('analysis');
+    setDeepAnalysis(null);
+    loadDeepAnalysis(painting.id);
+  };
+
+  const renderSealsInscriptions = (items: SealInscription[]) => {
+    if (!items || items.length === 0) return <Empty description="暂无印章题跋数据" />;
+    const seals = items.filter(i => i.type === 'seal');
+    const inscriptions = items.filter(i => i.type === 'inscription');
+    return (
+      <div>
+        {inscriptions.length > 0 && (
+          <>
+            <Title level={5} className="ink-title" style={{ color: '#5c4a33' }}>
+              ✍️ 题跋
+            </Title>
+            <List
+              dataSource={inscriptions}
+              renderItem={(item) => (
+                <List.Item style={{ border: 'none', padding: '12px 0', borderBottom: '1px dashed #e8dcc8' }}>
+                  <div style={{ width: '100%' }}>
+                    <Space style={{ marginBottom: 8 }}>
+                      <Tag color="#8b7355">{item.owner}</Tag>
+                      {item.dynasty && <Tag>{item.dynasty}</Tag>}
+                      {item.position && <Tag color="geekblue">{item.position}</Tag>}
+                    </Space>
+                    <Paragraph style={{ color: '#4a3f33', fontSize: 14, lineHeight: 1.9, fontStyle: 'italic', backgroundColor: '#fdfbf7', padding: 12, borderRadius: 8, margin: '8px 0' }}>
+                      "{item.content}"
+                    </Paragraph>
+                    {item.meaning && (
+                      <Text type="secondary" style={{ color: '#8b7355' }}>
+                        💡 {item.meaning}
+                      </Text>
+                    )}
+                  </div>
+                </List.Item>
+              )}
+            />
+          </>
+        )}
+        {seals.length > 0 && (
+          <>
+            <Divider />
+            <Title level={5} className="ink-title" style={{ color: '#5c4a33' }}>
+              🔴 鉴藏印章
+            </Title>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+              {seals.map((seal, i) => (
+                <Tooltip key={i} title={`${seal.owner}${seal.dynasty ? `（${seal.dynasty}）` : ''}${seal.meaning ? ` - ${seal.meaning}` : ''}`}>
+                  <div
+                    style={{
+                      background: 'linear-gradient(135deg, #c0392b 0%, #922b21 100%)',
+                      color: '#fdfbf7',
+                      padding: '10px 14px',
+                      borderRadius: 4,
+                      minWidth: 80,
+                      textAlign: 'center',
+                      fontSize: 13,
+                      fontWeight: 500,
+                      cursor: 'pointer',
+                      fontFamily: 'serif',
+                      boxShadow: '0 2px 8px rgba(192,57,43,0.3)'
+                    }}>
+                      <div style={{ fontSize: 11, opacity: 0.9, marginBottom: 2 }}>{seal.owner}</div>
+                      <div style={{ fontSize: 12 }}>{seal.content.slice(0, 6)}</div>
+                    </div>
+                  </Tooltip>
+                ))}
+              </div>
+            </>
+        )}
+      </div>
+    );
   };
 
   const renderAnalysisTab = (analysis: any) => {
     const sections = [
       { key: 'overallImpression', label: '整体印象', icon: <EyeOutlined /> },
-      { key: 'composition', label: '构图布局', icon: <InfoCircleOutlined /> },
+      { key: 'spatialLayout', label: '空间布局', icon: <InfoCircleOutlined /> },
       { key: 'brushwork', label: '用笔技法', icon: <HighlightOutlined /> },
+      { key: 'brushworkQuality', label: '笔墨品格', icon: <StarOutlined /> },
       { key: 'inkUse', label: '用墨特色', icon: <HighlightOutlined /> },
       { key: 'colorUse', label: '设色特点', icon: <HighlightOutlined /> },
       { key: 'culturalContext', label: '文化背景', icon: <BulbOutlined /> },
-      { key: 'artisticAchievement', label: '艺术成就', icon: <BulbOutlined /> }
+      { key: 'artisticAchievement', label: '艺术成就', icon: <BulbOutlined /> },
+      { key: 'transmissionHistory', label: '收藏传承', icon: <HistoryOutlined /> },
+      { key: 'scholarlyAppreciation', label: '历代品评', icon: <ReadOutlined /> },
+      { key: 'sealsAndInscriptions', label: '印章题跋', icon: <ShareAltOutlined /> }
     ];
 
     return (
       <Tabs
+        activeKey={activeModalTab}
+        onChange={setActiveModalTab}
         items={sections.map(section => ({
           key: section.key,
           label: (
@@ -110,13 +211,29 @@ function GalleryPage({ initialPaintingId, onInitialPaintingConsumed }: GalleryPa
           ),
           children: (
             <div className="analysis-section">
-              <Paragraph style={{ color: '#4a3f33', fontSize: 15, lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
-                {analysis[section.key]}
-              </Paragraph>
+              {section.key === 'sealsAndInscriptions' ? (
+                renderSealsInscriptions(analysis[section.key])
+              ) : (
+                <Paragraph style={{ color: '#4a3f33', fontSize: 15, lineHeight: 2, whiteSpace: 'pre-wrap' }}>
+                  {analysis[section.key]}
+                </Paragraph>
+              )}
             </div>
           )
         }))}
       />
+    );
+  };
+
+  const renderGraphTab = () => {
+    if (!selectedPainting) return null;
+    return (
+      <div style={{ marginTop: 16 }}>
+        <KnowledgeGraph
+          initialPaintingId={selectedPainting.id}
+          height={480}
+        />
+      </div>
     );
   };
 
@@ -131,10 +248,10 @@ function GalleryPage({ initialPaintingId, onInitialPaintingConsumed }: GalleryPa
   return (
     <div>
       <Title level={2} className="ink-title" style={{ color: '#5c4a33', marginBottom: 8 }}>
-        🖼️ 传世名画深度赏析
+        🖼️ 传世名画深度赏析（视觉认知）
       </Title>
       <Paragraph style={{ color: '#8b7355', marginBottom: 24 }}>
-        从构图、笔墨、设色、文化背景等多个维度，深入理解每一幅经典之作
+        从构图、笔墨品格、印章题跋、文化脉络等多个维度，结合知识图谱深入理解每一幅经典之作
       </Paragraph>
 
       <Card className="card-shadow" style={{ borderRadius: 16, marginBottom: 24 }}>
@@ -183,7 +300,27 @@ function GalleryPage({ initialPaintingId, onInitialPaintingConsumed }: GalleryPa
                 style={{ borderRadius: 16, height: '100%' }}
                 onClick={() => openPaintingDetail(painting)}
                 cover={
-                  <img src={painting.imageUrl} alt={painting.title} referrerPolicy="no-referrer" style={{ width: '100%', height: 220, objectFit: 'cover', borderTopLeftRadius: 16, borderTopRightRadius: 16, backgroundColor: '#f8f5ee' }} />
+                  <div style={{ position: 'relative' }}>
+                    <img
+                      src={painting.imageUrl}
+                      alt={painting.title}
+                      referrerPolicy="no-referrer"
+                      style={{
+                        width: '100%',
+                        height: 220,
+                        objectFit: 'cover',
+                        borderTopLeftRadius: 16,
+                        borderTopRightRadius: 16,
+                        backgroundColor: '#f8f5ee'
+                      }}
+                    />
+                    <Tag
+                      color="#8b7355"
+                      style={{ position: 'absolute', top: 12, right: 12 }}
+                    >
+                      👁️ AI深度鉴赏
+                    </Tag>
+                  </div>
                 }
               >
                 <Card.Meta
@@ -215,20 +352,40 @@ function GalleryPage({ initialPaintingId, onInitialPaintingConsumed }: GalleryPa
 
       <Modal
         open={modalVisible}
-        onCancel={() => setModalVisible(false)}
+        onCancel={() => { setModalVisible(false); setActiveModalTab('analysis'); }}
         footer={null}
-        width={900}
+        width={1000}
         destroyOnClose
       >
         {selectedPainting && (
           <div>
-            <img src={selectedPainting.imageUrl} alt={selectedPainting.title} referrerPolicy="no-referrer" style={{ width: '100%', maxHeight: 350, objectFit: 'contain', borderRadius: 12, marginBottom: 20, backgroundColor: '#f8f5ee' }} />
+            <Breadcrumb style={{ marginBottom: 12 }}>
+              <Breadcrumb.Item>🎨 画作欣赏</Breadcrumb.Item>
+              <Breadcrumb.Item>{getDynastyName(selectedPainting.dynastyId)}</Breadcrumb.Item>
+              <Breadcrumb.Item>{selectedPainting.title}</Breadcrumb.Item>
+            </Breadcrumb>
 
-            <Title level={2} className="ink-title" style={{ color: '#5c4a33', marginTop: 0 }}>
+            <div style={{ textAlign: 'center', marginBottom: 16 }}>
+              <img
+                src={selectedPainting.imageUrl}
+                alt={selectedPainting.title}
+                referrerPolicy="no-referrer"
+                style={{
+                  width: '100%',
+                  maxHeight: 380,
+                  objectFit: 'contain',
+                  borderRadius: 12,
+                  backgroundColor: '#f8f5ee',
+                  boxShadow: '0 4px 20px rgba(139,115,85,0.2)'
+                }}
+              />
+            </div>
+
+            <Title level={2} className="ink-title" style={{ color: '#5c4a33', marginTop: 0, textAlign: 'center' }}>
               {selectedPainting.title}
             </Title>
 
-            <Descriptions column={2} size="small" style={{ marginBottom: 24 }}>
+            <Descriptions column={2} size="small" style={{ marginBottom: 16 }}>
               <Descriptions.Item label="朝代">{getDynastyName(selectedPainting.dynastyId)}</Descriptions.Item>
               <Descriptions.Item label="作者">{getPainterName(selectedPainting.painterId)}</Descriptions.Item>
               <Descriptions.Item label="创作年代">{selectedPainting.year || '不详'}</Descriptions.Item>
@@ -238,50 +395,76 @@ function GalleryPage({ initialPaintingId, onInitialPaintingConsumed }: GalleryPa
               <Descriptions.Item label="收藏地" span={2}>{selectedPainting.collection}</Descriptions.Item>
             </Descriptions>
 
-            <Divider />
+            <Tabs
+              defaultActiveKey="analysis"
+              items={[
+                {
+                  key: 'analysis',
+                  label: <span><EyeOutlined /> AI深度鉴赏</span>,
+                  children: analysisLoading ? (
+                    <div style={{ padding: 40, textAlign: 'center' }}>
+                      <Spin size="large" tip="AI正在从多角度鉴赏此画..." />
+                    </div>
+                  ) : deepAnalysis ? (
+                    renderAnalysisTab(deepAnalysis)
+                  ) : (
+                    <Empty description="暂无深度鉴赏数据" />
+                  )
+                },
+                {
+                  key: 'graph',
+                  label: <span><AppstoreOutlined /> 知识图谱</span>,
+                  children: renderGraphTab()
+                }
+              ]}
+            />
 
-            <Title level={4} className="ink-title" style={{ color: '#5c4a33' }}>
-              📖 深度赏析
-            </Title>
-
-            {renderAnalysisTab(selectedPainting.analysis)}
-
-            {selectedPainting.analysis.funFacts && selectedPainting.analysis.funFacts.length > 0 && (
+            {deepAnalysis && activeModalTab === 'analysis' && (
               <>
-                <Divider />
-                <Title level={4} className="ink-title" style={{ color: '#5c4a33' }}>
-                  ✨ 趣闻轶事
-                </Title>
-                <List
-                  dataSource={selectedPainting.analysis.funFacts}
-                  renderItem={(item) => (
-                    <List.Item style={{ border: 'none', padding: '8px 0' }}>
-                      <Text style={{ color: '#6b5b45' }}>• {item}</Text>
-                    </List.Item>
-                  )}
-                />
+                {deepAnalysis.funFacts && deepAnalysis.funFacts.length > 0 && (
+                  <>
+                    <Divider />
+                    <Title level={4} className="ink-title" style={{ color: '#5c4a33' }}>
+                      ✨ 趣闻轶事
+                    </Title>
+                    <List
+                      dataSource={deepAnalysis.funFacts}
+                      renderItem={(item: string) => (
+                        <List.Item style={{ border: 'none', padding: '8px 0' }}>
+                          <Text style={{ color: '#6b5b45' }}>• {item}</Text>
+                        </List.Item>
+                      )}
+                    />
+                  </>
+                )}
+
+                {deepAnalysis.socraticQuestions && deepAnalysis.socraticQuestions.length > 0 && (
+                  <>
+                    <Divider />
+                    <Title level={4} className="ink-title" style={{ color: '#5c4a33' }}>
+                      💭 思考与讨论
+                    </Title>
+                    <List
+                      dataSource={deepAnalysis.socraticQuestions}
+                      renderItem={(item: string, index: number) => (
+                        <List.Item style={{ border: 'none', padding: '12px 0', borderBottom: index < deepAnalysis.socraticQuestions.length - 1 ? '1px dashed #e8dcc8' : 'none' }}>
+                          <div>
+                            <Tag color="#c0392b" style={{ marginRight: 8 }}>问题 {index + 1}</Tag>
+                            <Text strong style={{ color: '#5c4a33' }}>{item}</Text>
+                          </div>
+                        </List.Item>
+                      )}
+                    />
+                  </>
+                )}
               </>
             )}
 
-            {selectedPainting.analysis.socraticQuestions && selectedPainting.analysis.socraticQuestions.length > 0 && (
-              <>
-                <Divider />
-                <Title level={4} className="ink-title" style={{ color: '#5c4a33' }}>
-                  💭 思考与讨论
-                </Title>
-                <List
-                  dataSource={selectedPainting.analysis.socraticQuestions}
-                  renderItem={(item, index) => (
-                    <List.Item style={{ border: 'none', padding: '12px 0', borderBottom: index < selectedPainting.analysis.socraticQuestions.length - 1 ? '1px dashed #e8dcc8' : 'none' }}>
-                      <div>
-                        <Tag color="#c0392b" style={{ marginRight: 8 }}>问题 {index + 1}</Tag>
-                        <Text strong style={{ color: '#5c4a33' }}>{item}</Text>
-                      </div>
-                    </List.Item>
-                  )}
-                />
-              </>
-            )}
+            <div style={{ marginTop: 24, textAlign: 'center' }}>
+              <Button type="primary" icon={<PictureOutlined />} onClick={() => setModalVisible(false)}>
+                关闭
+              </Button>
+            </div>
           </div>
         )}
       </Modal>

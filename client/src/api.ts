@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type {
-  Dynasty, School, Painter, Painting, Theory, Flashcard, TreeNode, Stats
+  Dynasty, School, Painter, Painting, Theory, Flashcard, TreeNode, Stats, KnowledgeGraph
 } from './types';
 
 const api = axios.create({
@@ -22,6 +22,7 @@ export const knowledgeApi = {
   getPaintings: (params?: { dynastyId?: string; painterId?: string; schoolId?: string; theme?: string }) =>
     api.get<Painting[]>('/paintings', { params: params || {} }).then(r => r.data),
   getPainting: (id: string) => api.get<Painting>(`/paintings/${id}`).then(r => r.data),
+  getPaintingDeepAnalysis: (id: string) => api.get(`/paintings/${id}/deep-analysis`).then(r => r.data),
 
   getTheories: (dynastyId?: string) =>
     api.get<Theory[]>('/theories', { params: dynastyId ? { dynastyId } : {} }).then(r => r.data),
@@ -33,5 +34,7 @@ export const knowledgeApi = {
 
   getKnowledgeTree: () => api.get<TreeNode[]>('/knowledge-tree').then(r => r.data),
   getStats: () => api.get<Stats>('/stats').then(r => r.data),
-  search: (q: string) => api.get('/search', { params: { q } }).then(r => r.data)
+  search: (q: string) => api.get('/search', { params: { q } }).then(r => r.data),
+  getKnowledgeGraph: (params?: { painterId?: string; schoolId?: string; paintingId?: string; depth?: number }) =>
+    api.get<KnowledgeGraph>('/knowledge-graph', { params: params || {} }).then(r => r.data)
 };

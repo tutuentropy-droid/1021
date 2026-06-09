@@ -3,6 +3,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.schools = void 0;
 exports.schools = [
     {
+        id: 'qin-han-mural',
+        name: '秦汉壁画派',
+        dynastyId: 'qin-han',
+        description: '以墓室壁画、宫殿壁画、画像石、画像砖为代表的秦汉绘画流派，气势雄浑，造型古朴，体现大一统帝国的豪迈精神。',
+        tenets: [
+            '以壁画、画像石、画像砖为主要载体',
+            '功能以教化、升仙、记事为主，"成教化，助人伦"',
+            '造型古拙，线条飞动，气势雄浑',
+            '题材涵盖历史故事、神仙祥瑞、生产生活'
+        ],
+        representativePainters: ['毛延寿', '刘褒'],
+        influence: '奠定了中国绘画以线造型、重教化功能的传统，直接影响魏晋南北朝绘画的发展'
+    },
+    {
         id: 'green-shanshui-tang',
         name: '唐代青绿山水',
         dynastyId: 'tang',
@@ -185,5 +199,47 @@ exports.schools = [
         ],
         representativePainters: ['任伯年', '吴昌硕', '虚谷', '蒲华'],
         influence: '连接传统与现代，影响整个20世纪中国画发展'
+    },
+    {
+        id: 'jingjin-huapai',
+        name: '京津画派',
+        dynastyId: 'jin-xian-dai',
+        description: '民国时期活跃于北京、天津地区的画家群体，以延续传统文人画为己任，主张精研古法，博采新知，是传统中国画在现代的重要传承力量。',
+        tenets: [
+            '精研古法，博采新知',
+            '延续文人画传统，重视诗书画印一体',
+            '吸收西洋绘画之长，不盲目排斥',
+            '以"保存国粹"为己任，反对美术革命的极端主张'
+        ],
+        representativePainters: ['陈师曾', '齐白石', '金城', '陈半丁', '溥儒'],
+        influence: '传统文人画在现代的主要传承者，培养了大批传统功底深厚的画家，使中国画文脉在现代社会得以延续'
+    },
+    {
+        id: 'lingnan-huapai',
+        name: '岭南画派',
+        dynastyId: 'jin-xian-dai',
+        description: '由高剑父、高奇峰、陈树人创立的现代画派，主张"折衷中西，融会古今"，融合日本画与西洋画技法，画风清新明快，富有时代气息。',
+        tenets: [
+            '"折衷中西，融会古今"——中西融合',
+            '注重写生，师法自然',
+            '艺术为大众服务，反映时代精神',
+            '色彩明快，造型写实，善于表现南方风物'
+        ],
+        representativePainters: ['高剑父', '高奇峰', '陈树人', '关山月', '黎雄才', '赵少昂', '杨善深'],
+        influence: '是中国现代绘画革新的重要力量，推动了中国画从传统形态向现代形态的转型，影响岭南地区画坛近百年'
+    },
+    {
+        id: 'xin-wenrenhua',
+        name: '新文人画',
+        dynastyId: 'jin-xian-dai',
+        description: '20世纪80年代后兴起的中国画流派，在继承传统文人画精神的基础上，融入现代审美意识与个人情感表达，强调文化内涵与笔墨趣味的统一。',
+        tenets: [
+            '延续文人画"以画为寄"的精神传统',
+            '强调画家的文化修养与人格精神',
+            '注重笔墨趣味，但不拘泥于古法',
+            '融合现代审美，表现当代人的精神世界'
+        ],
+        representativePainters: ['朱新建', '李老十', '王孟奇', '陈平', '卢禹舜'],
+        influence: '在当代多元艺术格局中，为传统文人画注入现代活力，是中国画在全球化语境下寻求文化身份的重要探索'
     }
 ];

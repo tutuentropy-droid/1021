@@ -106,7 +106,9 @@ export const painters: Painter[] = [
     anecdotes: [
       '苏轼评价："味摩诘之诗，诗中有画；观摩诘之画，画中有诗"',
       '传说其画《袁安卧雪图》中有"雪中芭蕉"，打破时空限制，开写意先河'
-    ]
+    ],
+    studentIds: ['han-gan'],
+    influencedPainterIds: ['dong-yuan', 'ju-ran', 'huang-gongwang', 'wang-meng', 'wu-zhen', 'ni-zan', 'zhao-mengfu', 'dong-qichang']
   },
   {
     id: 'han-huang',
@@ -144,7 +146,9 @@ export const painters: Painter[] = [
     anecdotes: [
       '著《笔法记》，提出"气、韵、思、景、笔、墨"绘画"六要"',
       '主张"图真"，"度物象而取其真"，开山水画写生传统'
-    ]
+    ],
+    studentIds: ['guan-tong'],
+    influencedPainterIds: ['fan-kuan', 'li-cheng', 'guo-xi']
   },
   {
     id: 'guan-tong',
@@ -154,7 +158,9 @@ export const painters: Painter[] = [
     years: '生卒年不详，五代',
     biography: '五代后梁画家，长安（今陕西西安）人。师法荆浩，有"出蓝"之誉，与荆浩并称"荆关"。',
     style: '画山水"石体坚凝，杂木丰茂"，笔简气壮，景少意长，人称"关家山水"。',
-    famousWorks: ['关山行旅图', '山溪待渡图']
+    famousWorks: ['关山行旅图', '山溪待渡图'],
+    teacherIds: ['jing-hao'],
+    influencedPainterIds: ['li-cheng', 'fan-kuan', 'guo-xi']
   },
   {
     id: 'dong-yuan',
@@ -169,7 +175,10 @@ export const painters: Painter[] = [
     anecdotes: [
       '米芾评其画："峰峦出没，云雾显晦，不装巧趣，皆得天真"',
       '与巨然并称"董巨"，为元代文人画所宗'
-    ]
+    ],
+    teacherIds: ['wang-wei'],
+    studentIds: ['ju-ran'],
+    influencedPainterIds: ['ju-ran', 'huang-gongwang', 'wu-zhen', 'ni-zan', 'wang-meng', 'zhao-mengfu', 'dong-qichang', 'wang-shimin', 'wang-jian']
   },
   {
     id: 'ju-ran',
@@ -179,7 +188,9 @@ export const painters: Painter[] = [
     years: '生卒年不详，五代至宋初',
     biography: '五代宋初画家，江宁（今江苏南京）人。开元寺僧，师法董源，与其并称"董巨"。',
     style: '善画江南山水，笔墨秀润，善用"矾头"表现山顶碎石，长披麻皴表现山峦，开创"淡墨轻岚"一体。',
-    famousWorks: ['万壑松风图', '秋山问道图', '层岩丛树图']
+    famousWorks: ['万壑松风图', '秋山问道图', '层岩丛树图'],
+    teacherIds: ['dong-yuan', 'wang-wei'],
+    influencedPainterIds: ['huang-gongwang', 'wu-zhen', 'ni-zan', 'wang-meng', 'zhao-mengfu', 'dong-qichang', 'wang-shimin', 'wang-jian']
   },
   {
     id: 'huang-quan',
@@ -225,7 +236,9 @@ export const painters: Painter[] = [
     anecdotes: [
       '北宋后期其画已极为难得，米芾甚至欲作"无李论"',
       '与范宽、关仝并称"三家鼎峙，百代标程"'
-    ]
+    ],
+    teacherIds: ['jing-hao', 'guan-tong'],
+    influencedPainterIds: ['fan-kuan', 'guo-xi', 'wang-ximeng', 'dai-jin']
   },
   {
     id: 'fan-kuan',
@@ -240,7 +253,9 @@ export const painters: Painter[] = [
     anecdotes: [
       '初师李成，后叹曰："前人之法，未尝不近取诸物。吾与其师于人者，未若师诸物也；吾与其师于物者，未若师诸心"',
       '遂隐居终南山、太华山，对景造意，自成一家'
-    ]
+    ],
+    teacherIds: ['li-cheng', 'jing-hao', 'guan-tong'],
+    influencedPainterIds: ['tang-yin']
   },
   {
     id: 'guo-xi',
@@ -255,7 +270,9 @@ export const painters: Painter[] = [
     anecdotes: [
       '著有《林泉高致》，由其子郭思整理而成，是重要的山水画理论著作',
       '提出"春山淡冶而如笑，夏山苍翠而如滴，秋山明净而如妆，冬山惨淡而如睡"的四季山水特征'
-    ]
+    ],
+    teacherIds: ['li-cheng', 'jing-hao', 'guan-tong'],
+    influencedPainterIds: ['dai-jin']
   },
   {
     id: 'cui-bai',
@@ -307,7 +324,8 @@ export const painters: Painter[] = [
     anecdotes: [
       '南渡时一度流落街头卖画，被太尉邵渊发现，推荐入高宗朝画院',
       '与刘松年、马远、夏圭并称"南宋四大家"'
-    ]
+    ],
+    influencedPainterIds: ['ma-yuan', 'xia-gui', 'liu-songnian', 'tang-yin']
   },
   {
     id: 'zhao-ji',
@@ -370,7 +388,9 @@ export const painters: Painter[] = [
     anecdotes: [
       '《富春山居图》被誉为"画中之兰亭"，明末被烧断为两段，前段"剩山图"藏浙江省博物馆，后段"无用师卷"藏台北故宫博物院',
       '晚年居富春江畔，袖携纸笔，见山中树石怪奇，即就树石布写'
-    ]
+    ],
+    teacherIds: ['dong-yuan', 'ju-ran', 'wang-wei', 'zhao-mengfu'],
+    influencedPainterIds: ['shen-zhou', 'wang-shimin', 'wang-jian', 'wang-yuanqi', 'wang-hui', 'kun-can', 'dong-qichang']
   },
   {
     id: 'wang-meng',
@@ -386,7 +406,9 @@ export const painters: Painter[] = [
     anecdotes: [
       '明初出山为官，因胡惟庸案牵连死于狱中',
       '倪瓒评其画："王侯笔力能扛鼎，五百年来无此君"'
-    ]
+    ],
+    teacherIds: ['zhao-mengfu', 'dong-yuan', 'ju-ran', 'huang-gongwang'],
+    influencedPainterIds: ['shen-zhou', 'wen-zhengming', 'kun-can', 'dong-qichang']
   },
   {
     id: 'ni-zan',
@@ -402,7 +424,9 @@ export const painters: Painter[] = [
     anecdotes: [
       '性好洁，有洁癖，庭前梧桐每日令人洗拭',
       '自称"仆之所谓画者，不过逸笔草草，不求形似，聊以自娱耳"'
-    ]
+    ],
+    teacherIds: ['dong-yuan', 'ju-ran', 'huang-gongwang'],
+    influencedPainterIds: ['hong-ren', 'wen-zhengming', 'shen-zhou', 'dong-qichang']
   },
   {
     id: 'wu-zhen',
@@ -418,7 +442,9 @@ export const painters: Painter[] = [
     anecdotes: [
       '与盛懋比邻，盛懋画求者甚众，吴镇画无人问津，其妻笑之，吴镇曰："二十年后不复尔"，后果如其言',
       '自题墓碣"梅花和尚之塔"'
-    ]
+    ],
+    teacherIds: ['dong-yuan', 'ju-ran', 'huang-gongwang'],
+    influencedPainterIds: ['shen-zhou', 'wen-zhengming', 'dong-qichang']
   },
   {
     id: 'zhao-mengfu',
@@ -434,7 +460,10 @@ export const painters: Painter[] = [
     anecdotes: [
       '书法各体皆精，创"赵体"楷书，与颜柳欧并称楷书四大家',
       '《鹊华秋色图》为好友周密所作，描绘济南鹊山与华不注山秋色'
-    ]
+    ],
+    teacherIds: ['dong-yuan', 'ju-ran', 'wang-wei'],
+    studentIds: ['wang-meng'],
+    influencedPainterIds: ['wang-meng', 'huang-gongwang', 'wu-zhen', 'ni-zan', 'wen-zhengming', 'dong-qichang', 'shen-zhou']
   },
   {
     id: 'qian-xuan',
@@ -462,7 +491,10 @@ export const painters: Painter[] = [
     anecdotes: [
       '入宫时画《秋江独钓图》，画红袍人垂钓，被同僚谢环谗言"大红是朝官品服，用以钓鱼，甚为非礼"，遂被放归',
       '晚年穷困潦倒，死后画名方著'
-    ]
+    ],
+    teacherIds: ['ma-yuan', 'xia-gui', 'guo-xi', 'li-tang'],
+    studentIds: ['wu-wei'],
+    influencedPainterIds: ['wu-wei', 'tang-yin']
   },
   {
     id: 'shen-zhou',
@@ -478,7 +510,10 @@ export const painters: Painter[] = [
     anecdotes: [
       '文徵明、唐寅皆出其门下',
       '为人宽厚，有人仿其画求题款，亦欣然应允'
-    ]
+    ],
+    teacherIds: ['wang-meng', 'huang-gongwang', 'dong-yuan', 'ju-ran', 'wu-zhen', 'ni-zan', 'zhao-mengfu'],
+    studentIds: ['wen-zhengming', 'tang-yin'],
+    influencedPainterIds: ['wen-zhengming', 'tang-yin']
   },
   {
     id: 'wen-zhengming',
@@ -494,7 +529,10 @@ export const painters: Painter[] = [
     anecdotes: [
       '少时拙于书，每日临写《千字文》十本，遂以书法名家',
       '九次乡试不第，54岁才被荐入京，授翰林院待诏'
-    ]
+    ],
+    teacherIds: ['shen-zhou', 'zhao-mengfu', 'wang-meng', 'wu-zhen', 'ni-zan', 'huang-gongwang'],
+    studentIds: ['chen-chun', 'qiu-ying'],
+    influencedPainterIds: ['chen-chun', 'qiu-ying']
   },
   {
     id: 'tang-yin',
@@ -510,7 +548,9 @@ export const painters: Painter[] = [
     anecdotes: [
       '自刻印章"江南第一风流才子"',
       '作《桃花庵歌》："别人笑我太疯癫，我笑他人看不穿。不见五陵豪杰墓，无花无酒锄作田"'
-    ]
+    ],
+    teacherIds: ['shen-zhou', 'li-tang', 'liu-songnian', 'fan-kuan', 'ma-yuan', 'xia-gui'],
+    influencedPainterIds: []
   },
   {
     id: 'qiu-ying',
@@ -526,7 +566,9 @@ export const painters: Painter[] = [
     anecdotes: [
       '出身低微，漆工出身，凭刻苦努力成为一代大家',
       '与沈周、文徵明、唐寅并称"吴门四家"，为四家中学历最低者'
-    ]
+    ],
+    teacherIds: ['wen-zhengming', 'li-tang', 'liu-songnian', 'zhao-mengfu'],
+    influencedPainterIds: []
   },
   {
     id: 'xu-wei',
@@ -542,7 +584,8 @@ export const painters: Painter[] = [
     anecdotes: [
       '曾自杀九次未遂，又因杀妻入狱七年',
       '郑板桥愿为"青藤门下走狗"，齐白石"恨不生三百年前，为青藤磨墨理纸"'
-    ]
+    ],
+    influencedPainterIds: ['bada-shanren', 'shi-tao', 'zheng-banqiao', 'qi-baishi', 'wu-changshuo']
   },
   {
     id: 'chen-chun',
@@ -554,7 +597,9 @@ export const painters: Painter[] = [
     years: '1483-1544年',
     biography: '明代画家，长洲（今江苏苏州）人。文徵明弟子，善画写意花鸟，与徐渭并称"青藤白阳"。',
     style: '写意花鸟画笔墨灵动，设色淡雅，清隽疏爽，为写意花鸟重要的开拓人物。',
-    famousWorks: ['葵石图', '松石萱花图', '花卉册']
+    famousWorks: ['葵石图', '松石萱花图', '花卉册'],
+    teacherIds: ['wen-zhengming'],
+    influencedPainterIds: ['xu-wei', 'zheng-banqiao', 'qi-baishi']
   },
   {
     id: 'chen-hongshou',
@@ -582,7 +627,10 @@ export const painters: Painter[] = [
     anecdotes: [
       '倡"南北宗论"，将唐以来山水画分为"南宗"（文人画）与"北宗"（院体画），影响清代三百年',
       '其书画与董源、董邦达并称"三董"'
-    ]
+    ],
+    teacherIds: ['dong-yuan', 'ju-ran', 'huang-gongwang', 'ni-zan', 'wu-zhen', 'wang-meng', 'zhao-mengfu', 'wang-wei'],
+    studentIds: ['wang-shimin', 'wang-jian'],
+    influencedPainterIds: ['wang-shimin', 'wang-jian', 'wang-hui', 'wang-yuanqi', 'kun-can']
   },
   {
     id: 'wang-shimin',
@@ -598,7 +646,10 @@ export const painters: Painter[] = [
     anecdotes: [
       '家中藏有黄公望《富春山居图》等名迹，朝夕临摹',
       '王翚、吴历、王原祁皆出其门下'
-    ]
+    ],
+    teacherIds: ['dong-qichang', 'huang-gongwang'],
+    studentIds: ['wang-yuanqi', 'wang-hui'],
+    influencedPainterIds: ['wang-yuanqi', 'wang-hui', 'wang-jian']
   },
   {
     id: 'wang-jian',
@@ -610,7 +661,10 @@ export const painters: Painter[] = [
     years: '1598-1677年',
     biography: '明末清初画家，江苏太仓人。明代著名文人王世贞曾孙，家富收藏。',
     style: '山水师法董源、巨然及元四家，功力深厚，尤精青绿山水，"运笔中锋，用墨浓润"。',
-    famousWorks: ['仿北苑山水图', '长松仙馆图', '虞山十景图']
+    famousWorks: ['仿北苑山水图', '长松仙馆图', '虞山十景图'],
+    teacherIds: ['dong-qichang', 'dong-yuan', 'ju-ran', 'huang-gongwang'],
+    studentIds: ['wang-hui'],
+    influencedPainterIds: ['wang-hui']
   },
   {
     id: 'wang-hui',
@@ -626,7 +680,9 @@ export const painters: Painter[] = [
     anecdotes: [
       '60岁时被荐入京主持绘制《康熙南巡图》，历时三年完成',
       '自认"集大成"，自称"山水清晖"，被后人尊为"清初画圣"'
-    ]
+    ],
+    teacherIds: ['wang-shimin', 'wang-jian', 'huang-gongwang', 'dong-yuan', 'ju-ran', 'dong-qichang'],
+    influencedPainterIds: []
   },
   {
     id: 'wang-yuanqi',
@@ -642,7 +698,9 @@ export const painters: Painter[] = [
     anecdotes: [
       '奉命鉴定内府书画，编纂《佩文斋书画谱》',
       '作画"发端混仑，逐渐破碎，收拾破碎，复还混仑"'
-    ]
+    ],
+    teacherIds: ['wang-shimin', 'huang-gongwang', 'dong-qichang'],
+    influencedPainterIds: []
   },
   {
     id: 'bada-shanren',
@@ -658,7 +716,9 @@ export const painters: Painter[] = [
     anecdotes: [
       '书画署款"八大山人"，似"哭之"又似"笑之"，寓意"哭笑不得"',
       '常装疯卖傻，门上大书一"哑"字，对人不发一言'
-    ]
+    ],
+    teacherIds: ['xu-wei'],
+    influencedPainterIds: ['qi-baishi', 'pan-tianshou', 'zhang-daqian', 'wu-changshuo']
   },
   {
     id: 'shi-tao',
@@ -674,7 +734,9 @@ export const painters: Painter[] = [
     anecdotes: [
       '著《苦瓜和尚画语录》，提出"一画论"，主张"借古以开今"',
       '与弘仁、髡残、朱耷并称"清初四僧"'
-    ]
+    ],
+    teacherIds: ['xu-wei'],
+    influencedPainterIds: ['qi-baishi', 'zhang-daqian', 'fu-baoshi', 'pan-tianshou', 'huang-binhong']
   },
   {
     id: 'kun-can',
@@ -686,7 +748,9 @@ export const painters: Painter[] = [
     years: '1612-约1692年',
     biography: '明末清初画家，湖南武陵（今常德）人。明末出家为僧，后居南京牛首山幽栖寺。',
     style: '山水师法王蒙、黄公望，"奥境奇辟，缅邈幽深"，笔墨苍劲，干笔皴擦，淡墨渲染，浑厚华滋。',
-    famousWorks: ['层岩叠壑图', '溪山幽居图', '苍翠凌天图']
+    famousWorks: ['层岩叠壑图', '溪山幽居图', '苍翠凌天图'],
+    teacherIds: ['wang-meng', 'huang-gongwang', 'dong-qichang'],
+    influencedPainterIds: ['huang-binhong']
   },
   {
     id: 'hong-ren',
@@ -698,7 +762,9 @@ export const painters: Painter[] = [
     years: '1610-1664年',
     biography: '明末清初画家，安徽歙县人。明末诸生，明亡后出家为僧。',
     style: '山水师法倪瓒，多画黄山风景，构图极简，笔墨冷峻，"以渴笔写淡远"，开"新安画派"。',
-    famousWorks: ['晓江风便图', '黄海松石图', '梅屋松泉图']
+    famousWorks: ['晓江风便图', '黄海松石图', '梅屋松泉图'],
+    teacherIds: ['ni-zan', 'huang-gongwang'],
+    influencedPainterIds: []
   },
   {
     id: 'zheng-banqiao',
@@ -714,7 +780,9 @@ export const painters: Painter[] = [
     anecdotes: [
       '自称"四时不谢之兰，百节长青之竹，万古不败之石，千秋不变之人"',
       '在衙署书房曾写"难得糊涂"四字，下加小字注"聪明难，糊涂难，由聪明而转入糊涂更难"'
-    ]
+    ],
+    teacherIds: ['xu-wei', 'chen-chun', 'shi-tao'],
+    influencedPainterIds: ['qi-baishi']
   },
   {
     id: 'jin-nong',
@@ -758,7 +826,9 @@ export const painters: Painter[] = [
     anecdotes: [
       '自称"三十学诗，五十学画"，60岁后画名大著',
       '齐白石曾作诗："青藤雪个远凡胎，老缶衰年别有才。我欲九原为走狗，三家门下转轮来"'
-    ]
+    ],
+    teacherIds: ['xu-wei', 'bada-shanren', 'shi-tao', 'chen-chun'],
+    influencedPainterIds: ['qi-baishi', 'pan-tianshou']
   },
   {
     id: 'han-gan',
@@ -772,7 +842,8 @@ export const painters: Painter[] = [
     anecdotes: [
       '唐玄宗曾命韩幹向陈闳学画马，后见其画不同，问之，答曰："臣自有师。陛下内厩之马，皆臣之师也"',
       '与曹霸并称"曹韩"，杜甫有诗赞曰："弟子韩幹早入室，亦能画马穷殊相"'
-    ]
+    ],
+    teacherIds: ['wang-wei']
   },
   {
     id: 'bian-luan',
@@ -828,7 +899,9 @@ export const painters: Painter[] = [
     anecdotes: [
       '与夏圭并称"马夏"，构图"一角半边"，开南宋山水画新风',
       '家学渊源，曾祖马贲、祖父马兴祖、伯父马公显、父马世荣皆为画院画家'
-    ]
+    ],
+    teacherIds: ['li-tang'],
+    influencedPainterIds: ['dai-jin', 'wu-wei', 'tang-yin']
   },
   {
     id: 'xia-gui',
@@ -843,7 +916,9 @@ export const painters: Painter[] = [
     anecdotes: [
       '与马远并称"马夏"，其"半边"构图与马远的"一角"共同代表南宋院体山水的典型风格',
       '构图简练，"留白"极多，"以虚代实"，对后世影响深远'
-    ]
+    ],
+    teacherIds: ['li-tang'],
+    influencedPainterIds: ['dai-jin', 'wu-wei', 'tang-yin']
   },
   {
     id: 'liu-songnian',
@@ -853,7 +928,9 @@ export const painters: Painter[] = [
     years: '约1155-1218年',
     biography: '南宋画家，钱塘（今浙江杭州）人，因居清波门（暗门），人称"暗门刘"。孝宗、光宗、宁宗三朝画院待诏，"南宋四大家"之一。',
     style: '山水、人物兼善，山水师承李唐，笔墨精严，设色典雅；人物画精工细致，善画园林小景。',
-    famousWorks: ['四景山水图', '罗汉图', '中兴四将图', '醉僧图']
+    famousWorks: ['四景山水图', '罗汉图', '中兴四将图', '醉僧图'],
+    teacherIds: ['li-tang'],
+    influencedPainterIds: ['tang-yin']
   },
   {
     id: 'wang-mian',
@@ -901,7 +978,9 @@ export const painters: Painter[] = [
     anecdotes: [
       '嗜酒，常醉中作画，"醉后泼墨，信手涂抹，应手而生"',
       '孝宗曾召见，赐"画状元"印章，宠遇一时'
-    ]
+    ],
+    teacherIds: ['dai-jin', 'ma-yuan', 'xia-gui'],
+    influencedPainterIds: []
   },
   {
     id: 'zeng-jing',
@@ -980,7 +1059,10 @@ export const painters: Painter[] = [
       '"衰年变法"——五十七岁后听从陈师曾劝告，改变画风，自创"红花墨叶"体，终成一代宗师',
       '自言："作画妙在似与不似之间，太似为媚俗，不似为欺世"',
       '曾任中国美术家协会主席，1953年被授予"人民艺术家"称号'
-    ]
+    ],
+    teacherIds: ['xu-wei', 'bada-shanren', 'wu-changshuo', 'chen-shizeng', 'shi-tao', 'zheng-banqiao', 'chen-chun'],
+    studentIds: ['li-ke-ran'],
+    influencedPainterIds: ['li-ke-ran', 'pan-tianshou']
   },
   {
     id: 'huang-binhong',
@@ -997,7 +1079,10 @@ export const painters: Painter[] = [
       '提出"五笔七墨"说——五笔：平、圆、留、重、变；七墨：浓、淡、破、泼、渍、焦、宿',
       '早年"白宾虹"，晚年"黑宾虹"，七十岁后变法，创"浑厚华滋"新风格',
       '一生收藏古画万余件，精于鉴定，著有《古画微》《黄宾虹画语录》等'
-    ]
+    ],
+    teacherIds: ['kun-can', 'shi-tao', 'huang-gongwang', 'wang-meng', 'dong-yuan', 'ju-ran'],
+    studentIds: ['li-ke-ran'],
+    influencedPainterIds: ['li-ke-ran']
   },
   {
     id: 'xu-beihong',
@@ -1093,7 +1178,8 @@ export const painters: Painter[] = [
       '师齐白石十年，"我看齐老师画画，整整看了十年"，又师黄宾虹，得"积墨法"真传',
       '提出"采一炼十"——"采"即写生，"炼"即加工提炼，"采一而炼十"',
       '《万山红遍》以毛泽东《沁园春·长沙》词意创作，是其"红色山水画"的代表作'
-    ]
+    ],
+    teacherIds: ['qi-baishi', 'huang-binhong']
   },
   {
     id: 'jiang-zhaohe',
@@ -1108,7 +1194,8 @@ export const painters: Painter[] = [
       '《流民图》创作于1943年，描绘一百多个难民形象，控诉日本侵华战争的罪恶，是中国现代美术的不朽之作',
       '与徐悲鸿并称"徐蒋体系"，奠定了现代中国写实人物画的基础',
       '自言："知我者不多，爱我者尤少，识吾画者皆天下之穷人，唯我所同情者，乃道旁之饿殍"'
-    ]
+    ],
+    teacherIds: ['xu-beihong']
   },
   {
     id: 'gao-jianfu',
@@ -1142,6 +1229,7 @@ export const painters: Painter[] = [
       '劝说齐白石"衰年变法"，是齐白石艺术生涯中的贵人',
       '著《文人画之价值》，系统论证文人画的历史地位与现代价值，反驳"美术革命"对文人画的否定',
       '与鲁迅、陈寅恪等交谊深厚，其画学思想影响深远'
-    ]
+    ],
+    influencedPainterIds: ['qi-baishi']
   }
 ];

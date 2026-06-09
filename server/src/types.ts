@@ -31,6 +31,9 @@ export interface Painter {
   style: string;
   famousWorks: string[];
   anecdotes?: string[];
+  teacherIds?: string[];
+  studentIds?: string[];
+  influencedPainterIds?: string[];
 }
 
 export interface Painting {
@@ -59,6 +62,41 @@ export interface PaintingAnalysis {
   artisticAchievement: string;
   funFacts?: string[];
   socraticQuestions: string[];
+  sealsAndInscriptions?: SealInscription[];
+  brushworkQuality?: string;
+  spatialLayout?: string;
+  transmissionHistory?: string;
+  scholarlyAppreciation?: string;
+}
+
+export interface SealInscription {
+  type: 'seal' | 'inscription';
+  owner: string;
+  content: string;
+  meaning?: string;
+  position?: string;
+  dynasty?: string;
+}
+
+export interface KnowledgeGraphNode {
+  id: string;
+  type: 'painter' | 'school' | 'painting' | 'dynasty';
+  name: string;
+  description?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface KnowledgeGraphEdge {
+  id: string;
+  source: string;
+  target: string;
+  type: 'teacher' | 'student' | 'influenced' | 'belongsTo' | 'created' | 'inherits' | 'successor';
+  label: string;
+}
+
+export interface KnowledgeGraph {
+  nodes: KnowledgeGraphNode[];
+  edges: KnowledgeGraphEdge[];
 }
 
 export interface Theory {

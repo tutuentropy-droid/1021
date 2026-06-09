@@ -1,16 +1,20 @@
 import { useState, useEffect } from 'react';
-import { Row, Col, Tree, Card, Typography, Spin, Empty, Tag, Modal, Descriptions, List, Divider, Tabs, Button, Space } from 'antd';
-import { PictureOutlined, ReadOutlined } from '@ant-design/icons';
+import { Row, Col, Tree, Card, Typography, Spin, Empty, Tag, Modal, Descriptions, List, Divider, Tabs, Button, Space, Breadcrumb } from 'antd';
 import {
+  PictureOutlined,
+  ReadOutlined,
   EyeOutlined,
   BulbOutlined,
   InfoCircleOutlined,
-  HighlightOutlined
+  HighlightOutlined,
+  AppstoreOutlined,
+  TeamOutlined
 } from '@ant-design/icons';
 import type { TreeNode, Dynasty, School, Painter, Painting } from '../types';
 import { knowledgeApi } from '../api';
+import KnowledgeGraph from '../components/KnowledgeGraph';
 
-const { Title, Paragraph } = Typography;
+const { Title, Paragraph, Text } = Typography;
 
 interface KnowledgeTreeProps {
   onNavigate: (page: string, paintingId?: string) => void;
@@ -44,6 +48,8 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
   const [selectedData, setSelectedData] = useState<any>(null);
   const [selectedPainting, setSelectedPainting] = useState<Painting | null>(null);
   const [paintingDetailVisible, setPaintingDetailVisible] = useState(false);
+  const [knowledgeGraphVisible, setKnowledgeGraphVisible] = useState(false);
+  const [graphSource, setGraphSource] = useState<{ type: string; id: string } | null>(null);
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -241,6 +247,17 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
             <Paragraph style={{ color: '#6b5b45' }}>
               {selectedData.influence}
             </Paragraph>
+            <Space style={{ marginTop: 16 }}>
+              <Button
+                icon={<AppstoreOutlined />}
+                onClick={() => {
+                  setGraphSource({ type: 'school', id: selectedData.id });
+                  setKnowledgeGraphVisible(true);
+                }}
+              >
+                查看知识图谱
+              </Button>
+            </Space>
           </>
         )}
 
@@ -261,12 +278,95 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
             <Paragraph style={{ color: '#6b5b45' }}>
               {selectedData.biography}
             </Paragraph>
-            <Title level={4} className="ink-title" style={{ marginTop: 16, color: '#5c4a33' }}>
+            <Title level={4} className="ink-title" style={{ color: '#5c4a33' }}>
               艺术风格
             </Title>
             <Paragraph style={{ color: '#6b5b45' }}>
               {selectedData.style}
             </Paragraph>
+
+            {(selectedData.teacherIds?.length > 0 || selectedData.studentIds?.length > 0 || selectedData.influencedPainterIds?.length > 0) && (
+              <>
+                <Title level={4} className="ink-title" style={{ marginTop: 16, color: '#5c4a33' }}>
+                  <TeamOutlined /> 师承脉络
+                </Title>
+                {selectedData.teacherIds?.length > 0 && (
+                  <div style={{ marginBottom: 8 }}>
+                    <Text strong style={{ color: '#8b7355' }}>师承：</Text>
+                    <Space wrap style={{ marginLeft: 8 }}>
+                      {selectedData.teacherIds.map((tid: string) => {
+                        const p = painters.find(pp => pp.id === tid);
+                        return p ? (
+                          <Button
+                            key={tid}
+                            type="link"
+                            size="small"
+                            style={{ color: '#c0392b', padding: 0 }}
+                            onClick={() => selectNode('painter', tid)}
+                          >
+                            👨‍🎓 {p.name}
+                          </Button>
+                        ) : null;
+                      })}
+                    </Space>
+                  </div>
+                )}
+                {selectedData.studentIds?.length > 0 && (
+                  <div style={{ marginBottom: 8 }}>
+                    <Text strong style={{ color: '#8b7355' }}>传予：</Text>
+                    <Space wrap style={{ marginLeft: 8 }}>
+                      {selectedData.studentIds.map((sid: string) => {
+                        const p = painters.find(pp => pp.id === sid);
+                        return p ? (
+                          <Button
+                            key={sid}
+                            type="link"
+                            size="small"
+                            style={{ color: '#27ae60', padding: 0 }}
+                            onClick={() => selectNode('painter', sid)}
+                          >
+                            📖 {p.name}
+                          </Button>
+                        ) : null;
+                      })}
+                    </Space>
+                  </div>
+                )}
+                {selectedData.influencedPainterIds?.length > 0 && (
+                  <div>
+                    <Text strong style={{ color: '#8b7355' }}>影响后世：</Text>
+                    <Space wrap style={{ marginLeft: 8 }}>
+                      {selectedData.influencedPainterIds.map((iid: string) => {
+                        const p = painters.find(pp => pp.id === iid);
+                        return p ? (
+                          <Button
+                            key={iid}
+                            type="link"
+                            size="small"
+                            style={{ color: '#8e44ad', padding: 0 }}
+                            onClick={() => selectNode('painter', iid)}
+                          >
+                            ✨ {p.name}
+                          </Button>
+                        ) : null;
+                      })}
+                    </Space>
+                  </div>
+                )}
+                <Space style={{ marginTop: 12 }}>
+                  <Button
+                    icon={<AppstoreOutlined />}
+                    onClick={() => {
+                      setGraphSource({ type: 'painter', id: selectedData.id });
+                      setKnowledgeGraphVisible(true);
+                    }}
+                  >
+                    查看知识图谱
+                  </Button>
+                </Space>
+              </>
+            )}
+
             <Title level={4} className="ink-title" style={{ marginTop: 16, color: '#5c4a33' }}>
               代表作品
             </Title>
@@ -516,6 +616,33 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
               </Button>
             </div>
           </div>
+        )}
+      </Modal>
+
+      <Modal
+        open={knowledgeGraphVisible}
+        onCancel={() => setKnowledgeGraphVisible(false)}
+        footer={null}
+        width={1200}
+        destroyOnClose
+        title={
+          <span style={{ color: '#5c4a33' }}>
+            <AppstoreOutlined /> 知识图谱
+            {graphSource && (
+              <Tag color="#8b7355" style={{ marginLeft: 12 }}>
+                {graphSource.type === 'painter' ? '画家脉络' : graphSource.type === 'school' ? '画派脉络' : '画作关联'}
+              </Tag>
+            )}
+          </span>
+        }
+      >
+        {graphSource && (
+          <KnowledgeGraph
+            initialPainterId={graphSource.type === 'painter' ? graphSource.id : undefined}
+            initialSchoolId={graphSource.type === 'school' ? graphSource.id : undefined}
+            initialPaintingId={graphSource.type === 'painting' ? graphSource.id : undefined}
+            height={560}
+          />
         )}
       </Modal>
     </div>
