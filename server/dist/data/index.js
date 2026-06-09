@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.flashcards = exports.theories = exports.paintings = exports.painters = exports.schools = exports.dynasties = void 0;
+const dynasties_1 = require("./dynasties");
+Object.defineProperty(exports, "dynasties", { enumerable: true, get: function () { return dynasties_1.dynasties; } });
+const schools_1 = require("./schools");
+Object.defineProperty(exports, "schools", { enumerable: true, get: function () { return schools_1.schools; } });
+const painters_1 = require("./painters");
+Object.defineProperty(exports, "painters", { enumerable: true, get: function () { return painters_1.painters; } });
+const paintings_1 = require("./paintings");
+Object.defineProperty(exports, "paintings", { enumerable: true, get: function () { return paintings_1.paintings; } });
+const theories_1 = require("./theories");
+Object.defineProperty(exports, "theories", { enumerable: true, get: function () { return theories_1.theories; } });
+const flashcards_1 = require("./flashcards");
+Object.defineProperty(exports, "flashcards", { enumerable: true, get: function () { return flashcards_1.flashcards; } });

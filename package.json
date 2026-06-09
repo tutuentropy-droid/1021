@@ -1,0 +1,20 @@
+{
+  "name": "huamai-tongshi",
+  "version": "1.0.0",
+  "description": "画脉通识 - 中国画历史与系统知识学习系统",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm start",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start"
+  },
+  "keywords": ["chinese-painting", "art-history", "education", "knowledge-graph"],
+  "author": "画脉通识",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
