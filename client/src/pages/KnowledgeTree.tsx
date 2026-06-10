@@ -10,9 +10,11 @@ import {
   AppstoreOutlined,
   TeamOutlined,
   BookOutlined,
-  LinkOutlined
+  LinkOutlined,
+  EditOutlined,
+  MessageOutlined
 } from '@ant-design/icons';
-import type { TreeNode, Dynasty, School, Painter, Painting, ReadingRecommendation, ReadingCategory } from '../types';
+import type { TreeNode, Dynasty, School, Painter, Painting, ReadingRecommendation, ReadingCategory, LiteraryWork } from '../types';
 import { knowledgeApi } from '../api';
 import KnowledgeGraph from '../components/KnowledgeGraph';
 
@@ -30,6 +32,24 @@ const CATEGORY_COLORS: Record<ReadingCategory, string> = {
   academic: '#2c5282',
   documentary: '#c0392b',
   exhibition: '#27ae60'
+};
+
+const LITERARY_TYPE_LABELS: Record<string, string> = {
+  poem: '📜 题画诗',
+  colophon: '📝 画跋',
+  note: '📋 笔记',
+  letter: '✉️ 书信',
+  theory_excerpt: '📖 画论节选',
+  appreciation: '🎨 品评'
+};
+
+const LITERARY_TYPE_COLORS: Record<string, string> = {
+  poem: '#8b4513',
+  colophon: '#c0392b',
+  note: '#2c5282',
+  letter: '#27ae60',
+  theory_excerpt: '#8e44ad',
+  appreciation: '#d35400'
 };
 
 interface KnowledgeTreeProps {
@@ -70,6 +90,10 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
   const [loading, setLoading] = useState(true);
   const [readingRecommendation, setReadingRecommendation] = useState<ReadingRecommendation | null>(null);
   const [readingLoading, setReadingLoading] = useState(false);
+  const [literaryWorks, setLiteraryWorks] = useState<LiteraryWork[]>([]);
+  const [literaryWorksLoading, setLiteraryWorksLoading] = useState(false);
+  const [selectedLiteraryWork, setSelectedLiteraryWork] = useState<(LiteraryWork & { relatedPaintings: Painting[]; relatedPainters: Painter[] }) | null>(null);
+  const [literaryWorkModalVisible, setLiteraryWorkModalVisible] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -97,6 +121,31 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
       .then(data => setReadingRecommendation(data))
       .catch(() => setReadingRecommendation(null))
       .finally(() => setReadingLoading(false));
+  }, [selectedNode]);
+
+  useEffect(() => {
+    if (!selectedNode) {
+      setLiteraryWorks([]);
+      return;
+    }
+
+    setLiteraryWorksLoading(true);
+    let fetchPromise;
+
+    if (selectedNode.type === 'painting') {
+      fetchPromise = knowledgeApi.getPaintingLiteraryWorks(selectedNode.id);
+    } else if (selectedNode.type === 'painter') {
+      fetchPromise = knowledgeApi.getPainterLiteraryWorks(selectedNode.id);
+    } else {
+      setLiteraryWorks([]);
+      setLiteraryWorksLoading(false);
+      return;
+    }
+
+    fetchPromise
+      .then(data => setLiteraryWorks(data))
+      .catch(() => setLiteraryWorks([]))
+      .finally(() => setLiteraryWorksLoading(false));
   }, [selectedNode]);
 
   const convertToAntTree = (nodes: TreeNode[]): any[] => {
@@ -164,6 +213,15 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
 
   const goToGallery = (paintingId: string) => {
     onNavigate('gallery', paintingId);
+  };
+
+  const openLiteraryWorkDetail = (workId: string) => {
+    knowledgeApi.getLiteraryWork(workId)
+      .then(data => {
+        setSelectedLiteraryWork(data);
+        setLiteraryWorkModalVisible(true);
+      })
+      .catch(() => {});
   };
 
   const renderAnalysisTab = (analysis: any) => {
@@ -431,6 +489,81 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
                 </ul>
               </>
             )}
+
+            {literaryWorks.length > 0 && (
+              <>
+                <Divider />
+                <Title level={4} className="ink-title" style={{ color: '#5c4a33' }}>
+                  <MessageOutlined /> 相关诗文与画论
+                  <Tag color="#c0392b" style={{ marginLeft: 12, fontSize: 12 }}>
+                    共 {literaryWorks.length} 篇
+                  </Tag>
+                </Title>
+                {literaryWorksLoading ? (
+                  <div style={{ display: 'flex', justifyContent: 'center', padding: 20 }}>
+                    <Spin tip="加载相关诗文..." />
+                  </div>
+                ) : (
+                  <List
+                    dataSource={literaryWorks}
+                    renderItem={(item) => (
+                      <List.Item
+                        style={{ borderBottom: '1px dashed #e8dcc8', padding: '12px 0' }}
+                        actions={[
+                          <Button
+                            type="link"
+                            size="small"
+                            icon={<BookOutlined />}
+                            onClick={() => openLiteraryWorkDetail(item.id)}
+                            style={{ color: '#8b7355' }}
+                          >
+                            阅读全文
+                          </Button>
+                        ]}
+                      >
+                        <List.Item.Meta
+                          title={
+                            <Space>
+                              <Tag
+                                style={{
+                                  background: LITERARY_TYPE_COLORS[item.type],
+                                  color: '#fff',
+                                  border: 'none',
+                                  fontSize: 11
+                                }}
+                              >
+                                {LITERARY_TYPE_LABELS[item.type]}
+                              </Tag>
+                              <span style={{ color: '#5c4a33', fontWeight: 'bold' }}>{item.title}</span>
+                            </Space>
+                          }
+                          description={
+                            <div>
+                              <Text style={{ color: '#8b7355', fontSize: 13 }}>
+                                {item.author} · {dynasties.find(d => d.id === item.dynastyId)?.name || ''}
+                                {item.year && ` · ${item.year}`}
+                              </Text>
+                              <Paragraph
+                                ellipsis={{ rows: 2 }}
+                                style={{
+                                  color: '#6b5b45',
+                                  fontSize: 13,
+                                  marginTop: 8,
+                                  marginBottom: 0,
+                                  fontStyle: 'italic'
+                                }}
+                              >
+                                {item.content.slice(0, 100)}...
+                              </Paragraph>
+                            </div>
+                          }
+                        />
+                      </List.Item>
+                    )}
+                  />
+                )}
+              </>
+            )}
           </>
         )}
 
@@ -489,6 +622,81 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
                 前往画作欣赏
               </Button>
             </Space>
+
+            {literaryWorks.length > 0 && (
+              <>
+                <Divider />
+                <Title level={4} className="ink-title" style={{ color: '#5c4a33' }}>
+                  <EditOutlined /> 题咏与评跋
+                  <Tag color="#c0392b" style={{ marginLeft: 12, fontSize: 12 }}>
+                    共 {literaryWorks.length} 篇
+                  </Tag>
+                </Title>
+                {literaryWorksLoading ? (
+                  <div style={{ display: 'flex', justifyContent: 'center', padding: 20 }}>
+                    <Spin tip="加载相关诗文..." />
+                  </div>
+                ) : (
+                  <List
+                    dataSource={literaryWorks}
+                    renderItem={(item) => (
+                      <List.Item
+                        style={{ borderBottom: '1px dashed #e8dcc8', padding: '12px 0' }}
+                        actions={[
+                          <Button
+                            type="link"
+                            size="small"
+                            icon={<BookOutlined />}
+                            onClick={() => openLiteraryWorkDetail(item.id)}
+                            style={{ color: '#8b7355' }}
+                          >
+                            阅读全文
+                          </Button>
+                        ]}
+                      >
+                        <List.Item.Meta
+                          title={
+                            <Space>
+                              <Tag
+                                style={{
+                                  background: LITERARY_TYPE_COLORS[item.type],
+                                  color: '#fff',
+                                  border: 'none',
+                                  fontSize: 11
+                                }}
+                              >
+                                {LITERARY_TYPE_LABELS[item.type]}
+                              </Tag>
+                              <span style={{ color: '#5c4a33', fontWeight: 'bold' }}>{item.title}</span>
+                            </Space>
+                          }
+                          description={
+                            <div>
+                              <Text style={{ color: '#8b7355', fontSize: 13 }}>
+                                {item.author} · {dynasties.find(d => d.id === item.dynastyId)?.name || ''}
+                                {item.year && ` · ${item.year}`}
+                              </Text>
+                              <Paragraph
+                                ellipsis={{ rows: 2 }}
+                                style={{
+                                  color: '#6b5b45',
+                                  fontSize: 13,
+                                  marginTop: 8,
+                                  marginBottom: 0,
+                                  fontStyle: 'italic'
+                                }}
+                              >
+                                {item.content.slice(0, 100)}...
+                              </Paragraph>
+                            </div>
+                          }
+                        />
+                      </List.Item>
+                    )}
+                  />
+                )}
+              </>
+            )}
           </>
         )}
 
@@ -814,6 +1022,178 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
             initialPaintingId={graphSource.type === 'painting' ? graphSource.id : undefined}
             height={560}
           />
+        )}
+      </Modal>
+
+      <Modal
+        open={literaryWorkModalVisible}
+        onCancel={() => setLiteraryWorkModalVisible(false)}
+        footer={null}
+        width={800}
+        destroyOnClose
+      >
+        {selectedLiteraryWork && (
+          <div>
+            <Space style={{ marginBottom: 16 }}>
+              <Tag
+                style={{
+                  background: LITERARY_TYPE_COLORS[selectedLiteraryWork.type],
+                  color: '#fff',
+                  border: 'none',
+                  fontSize: 12
+                }}
+              >
+                {LITERARY_TYPE_LABELS[selectedLiteraryWork.type]}
+              </Tag>
+            </Space>
+            <Title level={2} className="ink-title" style={{ color: '#5c4a33', marginTop: 0 }}>
+              {selectedLiteraryWork.title}
+            </Title>
+            <Text style={{ color: '#8b7355' }}>
+              {selectedLiteraryWork.author} · {dynasties.find(d => d.id === selectedLiteraryWork.dynastyId)?.name || ''}
+              {selectedLiteraryWork.year && ` · ${selectedLiteraryWork.year}`}
+            </Text>
+
+            <Divider />
+
+            <div
+              style={{
+                padding: '20px 24px',
+                background: '#faf6ee',
+                borderRadius: 12,
+                borderLeft: '4px solid #8b7355',
+                marginBottom: 20
+              }}
+            >
+              <Title level={4} style={{ color: '#5c4a33', marginTop: 0 }}>
+                <EditOutlined /> 原文
+              </Title>
+              <Paragraph
+                style={{
+                  color: '#4a3f33',
+                  fontSize: 15,
+                  lineHeight: 2,
+                  whiteSpace: 'pre-wrap',
+                  marginBottom: 0,
+                  fontFamily: '"KaiTi", "STKaiti", serif'
+                }}
+              >
+                {selectedLiteraryWork.content}
+              </Paragraph>
+            </div>
+
+            {selectedLiteraryWork.translation && (
+              <div style={{ marginBottom: 20 }}>
+                <Title level={4} style={{ color: '#5c4a33' }}>
+                  📝 白话译文
+                </Title>
+                <Paragraph
+                  style={{
+                    color: '#6b5b45',
+                    fontSize: 14,
+                    lineHeight: 1.8,
+                    marginBottom: 0
+                  }}
+                >
+                  {selectedLiteraryWork.translation}
+                </Paragraph>
+              </div>
+            )}
+
+            {selectedLiteraryWork.background && (
+              <div style={{ marginBottom: 20 }}>
+                <Title level={4} style={{ color: '#5c4a33' }}>
+                  📜 创作背景
+                </Title>
+                <Paragraph
+                  style={{
+                    color: '#6b5b45',
+                    fontSize: 14,
+                    lineHeight: 1.8,
+                    marginBottom: 0
+                  }}
+                >
+                  {selectedLiteraryWork.background}
+                </Paragraph>
+              </div>
+            )}
+
+            {selectedLiteraryWork.appreciation && (
+              <div style={{ marginBottom: 20 }}>
+                <Title level={4} style={{ color: '#5c4a33' }}>
+                  🎨 赏析
+                </Title>
+                <Paragraph
+                  style={{
+                    color: '#6b5b45',
+                    fontSize: 14,
+                    lineHeight: 1.8,
+                    marginBottom: 0,
+                    padding: '12px 16px',
+                    background: '#f0e9dc',
+                    borderRadius: 8
+                  }}
+                >
+                  {selectedLiteraryWork.appreciation}
+                </Paragraph>
+              </div>
+            )}
+
+            {selectedLiteraryWork.relatedPaintings && selectedLiteraryWork.relatedPaintings.length > 0 && (
+              <>
+                <Divider />
+                <Title level={4} style={{ color: '#5c4a33' }}>
+                  <PictureOutlined /> 关联画作
+                  <Tag color="#c0392b" style={{ marginLeft: 12, fontSize: 12 }}>
+                    {selectedLiteraryWork.relatedPaintings.length} 幅
+                  </Tag>
+                </Title>
+                <List
+                  grid={{ gutter: 12, xs: 1, sm: 2, md: 2, lg: 2, xl: 3 }}
+                  dataSource={selectedLiteraryWork.relatedPaintings}
+                  renderItem={(painting) => (
+                    <List.Item>
+                      <Card
+                        hoverable
+                        size="small"
+                        cover={
+                          <img
+                            src={painting.imageUrl}
+                            alt={painting.title}
+                            referrerPolicy="no-referrer"
+                            style={{ height: 120, objectFit: 'cover' }}
+                          />
+                        }
+                        bodyStyle={{ padding: 12 }}
+                        onClick={() => {
+                          setLiteraryWorkModalVisible(false);
+                          selectNode('painting', painting.id);
+                        }}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <Card.Meta
+                          title={<span style={{ fontSize: 13, color: '#5c4a33' }}>{painting.title}</span>}
+                          description={
+                            <span style={{ fontSize: 12, color: '#8b7355' }}>
+                              {painters.find(p => p.id === painting.painterId)?.name || '佚名'}
+                            </span>
+                          }
+                        />
+                      </Card>
+                    </List.Item>
+                  )}
+                />
+              </>
+            )}
+
+            {selectedLiteraryWork.source && (
+              <div style={{ marginTop: 20, textAlign: 'right' }}>
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  出处：{selectedLiteraryWork.source}
+                </Text>
+              </div>
+            )}
+          </div>
         )}
       </Modal>
     </div>

@@ -674,6 +674,55 @@ router.post('/roleplay-result', (req, res) => {
         }
     });
 });
+router.get('/literary-works', (req, res) => {
+    const { paintingId, painterId, dynastyId, type } = req.query;
+    let result = data_1.literaryWorks;
+    if (paintingId) {
+        result = result.filter(w => w.relatedPaintingIds.includes(paintingId));
+    }
+    if (painterId) {
+        result = result.filter(w => w.relatedPainterIds?.includes(painterId));
+    }
+    if (dynastyId) {
+        result = result.filter(w => w.dynastyId === dynastyId);
+    }
+    if (type) {
+        result = result.filter(w => w.type === type);
+    }
+    res.json(result);
+});
+router.get('/literary-works/:id', (req, res) => {
+    const work = data_1.literaryWorks.find(w => w.id === req.params.id);
+    if (!work) {
+        res.status(404).json({ error: '文学作品不存在' });
+        return;
+    }
+    const relatedPaintings = data_1.paintings.filter(p => work.relatedPaintingIds.includes(p.id));
+    const relatedPainters = data_1.painters.filter(p => work.relatedPainterIds?.includes(p.id));
+    res.json({ ...work, relatedPaintings, relatedPainters });
+});
+router.get('/paintings/:id/literary-works', (req, res) => {
+    const painting = data_1.paintings.find(p => p.id === req.params.id);
+    if (!painting) {
+        res.status(404).json({ error: '画作不存在' });
+        return;
+    }
+    const works = data_1.literaryWorks.filter(w => w.relatedPaintingIds.includes(req.params.id));
+    res.json(works);
+});
+router.get('/painters/:id/literary-works', (req, res) => {
+    const painter = data_1.painters.find(p => p.id === req.params.id);
+    if (!painter) {
+        res.status(404).json({ error: '画家不存在' });
+        return;
+    }
+    const works = data_1.literaryWorks.filter(w => w.relatedPainterIds?.includes(req.params.id) ||
+        w.relatedPaintingIds.some(pid => {
+            const p = data_1.paintings.find(pt => pt.id === pid);
+            return p?.painterId === req.params.id;
+        }));
+    res.json(works);
+});
 router.get('/reading-recommendations', (req, res) => {
     const { contextType, contextId } = req.query;
     let items = [];

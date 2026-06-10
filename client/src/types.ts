@@ -247,6 +247,25 @@ export interface ReadingItem {
   sourceUrl?: string;
 }
 
+export type LiteraryWorkType = 'poem' | 'colophon' | 'note' | 'letter' | 'theory_excerpt' | 'appreciation';
+
+export interface LiteraryWork {
+  id: string;
+  type: LiteraryWorkType;
+  title: string;
+  author: string;
+  authorId?: string;
+  dynastyId: string;
+  year?: string;
+  content: string;
+  translation?: string;
+  background?: string;
+  appreciation?: string;
+  relatedPaintingIds: string[];
+  relatedPainterIds?: string[];
+  source?: string;
+}
+
 export interface ReadingRecommendation {
   contextType: 'dynasty' | 'school' | 'painter' | 'painting' | 'general';
   contextName: string;

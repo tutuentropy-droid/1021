@@ -1,7 +1,8 @@
 import axios from 'axios';
 import type {
   Dynasty, School, Painter, Painting, Theory, Flashcard, TreeNode, Stats, KnowledgeGraph,
-  RoleplayScenario, RoleplayChoice, RoleplayConsequence, RoleplayResult, ReadingRecommendation
+  RoleplayScenario, RoleplayChoice, RoleplayConsequence, RoleplayResult, ReadingRecommendation,
+  LiteraryWork, LiteraryWorkType
 } from './types';
 
 const api = axios.create({
@@ -49,5 +50,17 @@ export const knowledgeApi = {
     api.post<RoleplayResult>('/roleplay-result', { scenarioId, path }).then(r => r.data),
 
   getReadingRecommendations: (params?: { contextType?: 'dynasty' | 'school' | 'painter' | 'painting'; contextId?: string }) =>
-    api.get<ReadingRecommendation>('/reading-recommendations', { params: params || {} }).then(r => r.data)
+    api.get<ReadingRecommendation>('/reading-recommendations', { params: params || {} }).then(r => r.data),
+
+  getLiteraryWorks: (params?: { paintingId?: string; painterId?: string; dynastyId?: string; type?: LiteraryWorkType }) =>
+    api.get<LiteraryWork[]>('/literary-works', { params: params || {} }).then(r => r.data),
+
+  getLiteraryWork: (id: string) =>
+    api.get<LiteraryWork & { relatedPaintings: Painting[]; relatedPainters: Painter[] }>(`/literary-works/${id}`).then(r => r.data),
+
+  getPaintingLiteraryWorks: (paintingId: string) =>
+    api.get<LiteraryWork[]>(`/paintings/${paintingId}/literary-works`).then(r => r.data),
+
+  getPainterLiteraryWorks: (painterId: string) =>
+    api.get<LiteraryWork[]>(`/painters/${painterId}/literary-works`).then(r => r.data)
 };

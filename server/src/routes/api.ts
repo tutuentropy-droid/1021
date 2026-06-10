@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
-import { dynasties, schools, painters, paintings, theories, flashcards, scenarios, readings } from '../data';
-import type { KnowledgeGraph, KnowledgeGraphNode, KnowledgeGraphEdge, ReadingRecommendation, ReadingItem } from '../types';
+import { dynasties, schools, painters, paintings, theories, flashcards, scenarios, readings, literaryWorks } from '../data';
+import type { KnowledgeGraph, KnowledgeGraphNode, KnowledgeGraphEdge, ReadingRecommendation, ReadingItem, LiteraryWork } from '../types';
 
 const router = Router();
 
@@ -704,6 +704,63 @@ router.post('/roleplay-result', (req: Request, res: Response) => {
       summary
     }
   });
+});
+
+router.get('/literary-works', (req: Request, res: Response) => {
+  const { paintingId, painterId, dynastyId, type } = req.query;
+  let result = literaryWorks;
+
+  if (paintingId) {
+    result = result.filter(w => w.relatedPaintingIds.includes(paintingId as string));
+  }
+  if (painterId) {
+    result = result.filter(w => w.relatedPainterIds?.includes(painterId as string));
+  }
+  if (dynastyId) {
+    result = result.filter(w => w.dynastyId === dynastyId);
+  }
+  if (type) {
+    result = result.filter(w => w.type === type);
+  }
+
+  res.json(result);
+});
+
+router.get('/literary-works/:id', (req: Request, res: Response) => {
+  const work = literaryWorks.find(w => w.id === req.params.id);
+  if (!work) {
+    res.status(404).json({ error: '文学作品不存在' });
+    return;
+  }
+  const relatedPaintings = paintings.filter(p => work.relatedPaintingIds.includes(p.id));
+  const relatedPainters = painters.filter(p => work.relatedPainterIds?.includes(p.id));
+  res.json({ ...work, relatedPaintings, relatedPainters });
+});
+
+router.get('/paintings/:id/literary-works', (req: Request, res: Response) => {
+  const painting = paintings.find(p => p.id === req.params.id);
+  if (!painting) {
+    res.status(404).json({ error: '画作不存在' });
+    return;
+  }
+  const works = literaryWorks.filter(w => w.relatedPaintingIds.includes(req.params.id));
+  res.json(works);
+});
+
+router.get('/painters/:id/literary-works', (req: Request, res: Response) => {
+  const painter = painters.find(p => p.id === req.params.id);
+  if (!painter) {
+    res.status(404).json({ error: '画家不存在' });
+    return;
+  }
+  const works = literaryWorks.filter(w =>
+    w.relatedPainterIds?.includes(req.params.id) ||
+    w.relatedPaintingIds.some(pid => {
+      const p = paintings.find(pt => pt.id === pid);
+      return p?.painterId === req.params.id;
+    })
+  );
+  res.json(works);
 });
 
 router.get('/reading-recommendations', (req: Request, res: Response) => {
