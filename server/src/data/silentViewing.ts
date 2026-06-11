@@ -6,7 +6,7 @@ export const silentViewingData: SilentViewingData[] = [
     paintingId: 'fuchun-shanju-tu',
     paintingTitle: '富春山居图',
     painterName: '黄公望',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Dwelling_in_the_Fuchun_Mountains_%28first_half%29.JPG/960px-Dwelling_in_the_Fuchun_Mountains_%28first_half%29.JPG',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Dwelling_in_the_Fuchun_Mountains_%28first_half%29.JPG/1600px-Dwelling_in_the_Fuchun_Mountains_%28first_half%29.JPG',
     textContent: '兴之所至，不觉亹亹布置如许，逐旋填札，阅三四载未得完备，盖因留在山中，而云游在外故尔。今特取回行李中，早晚得暇，当为着笔。无用过虑有巧取豪敚者，俾先识卷末，庶使知其成就之难也。',
     textSource: '黄公望《富春山居图》自题',
     viewingHints: [
@@ -21,7 +21,7 @@ export const silentViewingData: SilentViewingData[] = [
     paintingId: 'xishan-xinglu-tu',
     paintingTitle: '溪山行旅图',
     painterName: '范宽',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Fan_Kuan_-_Travelers_Among_Mountains_and_Streams_-_Google_Art_Project.jpg/960px-Fan_Kuan_-_Travelers_Among_Mountains_and_Streams_-_Google_Art_Project.jpg',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Fan_Kuan_-_Travelers_Among_Mountains_and_Streams_-_Google_Art_Project.jpg/1000px-Fan_Kuan_-_Travelers_Among_Mountains_and_Streams_-_Google_Art_Project.jpg',
     textContent: '师诸人者，未若师诸物也；师诸物者，未若师诸心。',
     textSource: '范宽语',
     viewingHints: [
@@ -36,7 +36,7 @@ export const silentViewingData: SilentViewingData[] = [
     paintingId: 'qingming-shanghe-tu',
     paintingTitle: '清明上河图',
     painterName: '张择端',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Along_the_River_During_the_Qingming_festival.jpg/960px-Along_the_River_During_the_Qingming_festival.jpg',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Along_the_River_During_the_Qingming_festival.jpg/1600px-Along_the_River_During_the_Qingming_festival.jpg',
     textContent: '宋家汴都全盛时，万方玉帛梯航随。清明上河俗所尚，倾城仕女携童儿。繁华盛事随逝川，丹青尚有当时传。',
     textSource: '李东阳《清明上河图记》',
     viewingHints: [
@@ -51,7 +51,7 @@ export const silentViewingData: SilentViewingData[] = [
     paintingId: 'hanxizai-yeyan-tu',
     paintingTitle: '韩熙载夜宴图',
     painterName: '顾闳中',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Gu_Hongzhong%27s_Night_Revels_1_complete_scene.jpg/960px-Gu_Hongzhong%27s_Night_Revels_1_complete_scene.jpg',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Gu_Hongzhong%27s_Night_Revels_1_complete_scene.jpg/1600px-Gu_Hongzhong%27s_Night_Revels_1_complete_scene.jpg',
     textContent: '君子不器，韩熙载果何人哉？其识时务邪？其怀不遇邪？览图三叹，想见其人。',
     textSource: '苏轼《书韩熙载夜宴图》',
     viewingHints: [
@@ -66,7 +66,7 @@ export const silentViewingData: SilentViewingData[] = [
     paintingId: 'qianli-jiangshan-tu',
     paintingTitle: '千里江山图',
     painterName: '王希孟',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Wang_Ximeng._A_Thousand_Li_of_Rivers_and_Mountains._%28Complete%2C_51%2C3x1191%2C5_cm%29._1113._Palace_museum%2C_Beijing.jpg/960px-Wang_Ximeng._A_Thousand_Li_of_Rivers_and_Mountains._%28Complete%2C_51%2C3x1191%2C5_cm%29._1113._Palace_museum%2C_Beijing.jpg',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Wang_Ximeng._A_Thousand_Li_of_Rivers_and_Mountains._%28Complete%2C_51%2C3x1191%2C5_cm%29._1113._Palace_museum%2C_Beijing.jpg/1600px-Wang_Ximeng._A_Thousand_Li_of_Rivers_and_Mountains._%28Complete%2C_51%2C3x1191%2C5_cm%29._1113._Palace_museum%2C_Beijing.jpg',
     textContent: '不逾半岁，乃以此图进。上嘉之，因以赐臣京，谓天下士在作之而已。',
     textSource: '蔡京《千里江山图》题跋',
     viewingHints: [
@@ -81,7 +81,7 @@ export const silentViewingData: SilentViewingData[] = [
     paintingId: 'zhu-shi-tu',
     paintingTitle: '墨葡萄图',
     painterName: '徐渭',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/41/Xu_Wei_Grapes.jpg',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Xu_Wei_-_Grapes.jpg/600px-Xu_Wei_-_Grapes.jpg',
     textContent: '半生落魄已成翁，独立书斋啸晚风。笔底明珠无处卖，闲抛闲掷野藤中。',
     textSource: '徐渭《墨葡萄图》自题诗',
     viewingHints: [
@@ -96,7 +96,7 @@ export const silentViewingData: SilentViewingData[] = [
     paintingId: 'luoshen-fu-tu',
     paintingTitle: '洛神赋图',
     painterName: '顾恺之',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Gu_Kaizhi_river_Lo.jpg/960px-Gu_Kaizhi_river_Lo.jpg',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Gu_Kaizhi_The_Nymph_of_the_Luo_River.jpg/1600px-Gu_Kaizhi_The_Nymph_of_the_Luo_River.jpg',
     textContent: '其形也，翩若惊鸿，婉若游龙。荣曜秋菊，华茂春松。仿佛兮若轻云之蔽月，飘飖兮若流风之回雪。',
     textSource: '曹植《洛神赋》',
     viewingHints: [
@@ -111,7 +111,7 @@ export const silentViewingData: SilentViewingData[] = [
     paintingId: 'jiu-ge-tu',
     paintingTitle: '九歌图',
     painterName: '张渥',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/%22Nine_Songs%22_by_Zhang_Wo_and_Chu_Huan.jpg/960px-%22Nine_Songs%22_by_Zhang_Wo_and_Chu_Huan.jpg',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Zhang_Wo_-_Nine_Songs.jpg/1000px-Zhang_Wo_-_Nine_Songs.jpg',
     textContent: '帝子降兮北渚，目眇眇兮愁予。袅袅兮秋风，洞庭波兮木叶下。',
     textSource: '屈原《九歌·湘夫人》',
     viewingHints: [

@@ -356,21 +356,218 @@ const AncientChinaMap = ({ route, onStopSelect }: { route?: PainterTravelRoute; 
 const ClimateSimulationPanel = ({ climate }: { climate: ClimateSimulation }) => {
   const [currentConditionIdx, setCurrentConditionIdx] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [soundEnabled, setSoundEnabled] = useState(false);
+  const [audioReady, setAudioReady] = useState(false);
   const timerRef = useRef<number | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const soundNodesRef = useRef<Record<string, { source: AudioBufferSourceNode; gain: GainNode; filter?: BiquadFilterNode }>>({});
 
   useEffect(() => {
-    if (isPlaying) {
+    setCurrentConditionIdx(0);
+    setIsPlaying(false);
+  }, [climate.id]);
+
+  useEffect(() => {
+    if (isPlaying && climate.conditions.length > 0) {
       timerRef.current = window.setInterval(() => {
         setCurrentConditionIdx(prev => (prev + 1) % climate.conditions.length);
       }, 4000);
-    } else if (timerRef.current) {
-      clearInterval(timerRef.current);
     }
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
     };
-  }, [isPlaying, climate.conditions.length]);
+  }, [isPlaying, climate.conditions.length, climate.id]);
+
+  const createNoiseBuffer = (ctx: AudioContext, type: 'white' | 'pink' | 'brown'): AudioBuffer => {
+    const bufferSize = 2 * ctx.sampleRate;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const output = buffer.getChannelData(0);
+    if (type === 'white') {
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+    } else if (type === 'pink') {
+      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+        b6 = white * 0.115926;
+      }
+    } else {
+      let lastOut = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        output[i] = (lastOut + 0.02 * white) / 1.02;
+        lastOut = output[i];
+        output[i] *= 3.5;
+      }
+    }
+    return buffer;
+  };
+
+  const initAudio = () => {
+    if (audioContextRef.current) return;
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    audioContextRef.current = ctx;
+
+    const masterGain = ctx.createGain();
+    masterGain.gain.value = 0;
+    masterGain.connect(ctx.destination);
+
+    climate.ambientSounds.forEach(sound => {
+      let buffer: AudioBuffer;
+      let filterType: BiquadFilterType = 'lowpass';
+      let filterFreq = 1000;
+      let baseGain = sound.intensity * 0.15;
+
+      switch (sound.type) {
+        case 'wind':
+          buffer = createNoiseBuffer(ctx, 'pink');
+          filterType = 'lowpass';
+          filterFreq = 400 + sound.intensity * 600;
+          baseGain = sound.intensity * 0.2;
+          break;
+        case 'waterfall':
+          buffer = createNoiseBuffer(ctx, 'white');
+          filterType = 'bandpass';
+          filterFreq = 800 + sound.intensity * 1000;
+          baseGain = sound.intensity * 0.18;
+          break;
+        case 'stream':
+          buffer = createNoiseBuffer(ctx, 'pink');
+          filterType = 'bandpass';
+          filterFreq = 600 + sound.intensity * 800;
+          baseGain = sound.intensity * 0.1;
+          break;
+        case 'rain':
+          buffer = createNoiseBuffer(ctx, 'white');
+          filterType = 'highpass';
+          filterFreq = 1500;
+          baseGain = sound.intensity * 0.08;
+          break;
+        case 'birds':
+        case 'insects':
+        case 'temple_bell':
+          buffer = createNoiseBuffer(ctx, 'pink');
+          filterType = 'bandpass';
+          filterFreq = sound.type === 'temple_bell' ? 200 : sound.type === 'insects' ? 3000 : 2500;
+          baseGain = sound.intensity * 0.05;
+          break;
+        default:
+          buffer = createNoiseBuffer(ctx, 'pink');
+          filterType = 'lowpass';
+          filterFreq = 500;
+          baseGain = sound.intensity * 0.1;
+      }
+
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      source.loop = true;
+
+      const filter = ctx.createBiquadFilter();
+      filter.type = filterType;
+      filter.frequency.value = filterFreq;
+      filter.Q.value = sound.type === 'waterfall' || sound.type === 'stream' ? 0.5 : 1;
+
+      const gainNode = ctx.createGain();
+      gainNode.gain.value = baseGain;
+
+      source.connect(filter);
+      filter.connect(gainNode);
+      gainNode.connect(masterGain);
+
+      source.start();
+
+      soundNodesRef.current[sound.id] = { source, gain: gainNode, filter };
+    });
+
+    (soundNodesRef.current as any)._masterGain = masterGain;
+    setAudioReady(true);
+  };
+
+  useEffect(() => {
+    if (soundEnabled && audioContextRef.current) {
+      const ctx = audioContextRef.current;
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
+      const masterGain = (soundNodesRef.current as any)._masterGain;
+      if (masterGain) {
+        masterGain.gain.cancelScheduledValues(ctx.currentTime);
+        masterGain.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.8);
+      }
+    } else if (!soundEnabled && audioContextRef.current) {
+      const ctx = audioContextRef.current;
+      const masterGain = (soundNodesRef.current as any)._masterGain;
+      if (masterGain) {
+        masterGain.gain.cancelScheduledValues(ctx.currentTime);
+        masterGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.5);
+      }
+    }
+  }, [soundEnabled]);
+
+  useEffect(() => {
+    if (!audioContextRef.current || !soundEnabled) return;
+    const ctx = audioContextRef.current;
+    const condition = climate.conditions[currentConditionIdx];
+    if (!condition) return;
+
+    climate.ambientSounds.forEach(sound => {
+      const node = soundNodesRef.current[sound.id];
+      if (node && node.gain) {
+        let intensityMult = 1;
+        if (sound.type === 'wind') {
+          intensityMult = 0.4 + (condition.windSpeed / 30) * 0.6;
+        } else if (sound.type === 'waterfall' || sound.type === 'stream') {
+          intensityMult = 0.7 + (condition.humidity / 100) * 0.3;
+        } else if (sound.type === 'birds') {
+          intensityMult = condition.timeOfDay === 'dawn' || condition.timeOfDay === 'morning' ? 1 : 0.3;
+        } else if (sound.type === 'insects') {
+          intensityMult = condition.timeOfDay === 'dusk' || condition.timeOfDay === 'night' ? 1 : 0.2;
+        } else if (sound.type === 'temple_bell') {
+          intensityMult = 0.4 + Math.random() * 0.3;
+        }
+        const targetGain = sound.intensity * 0.15 * intensityMult;
+        node.gain.gain.cancelScheduledValues(ctx.currentTime);
+        node.gain.gain.linearRampToValueAtTime(Math.min(targetGain, 0.3), ctx.currentTime + 1.5);
+      }
+    });
+  }, [currentConditionIdx, soundEnabled, climate.conditions, climate.ambientSounds, climate.id]);
+
+  useEffect(() => {
+    return () => {
+      Object.values(soundNodesRef.current).forEach(node => {
+        try { node.source.stop(); } catch (e) {}
+      });
+      soundNodesRef.current = {};
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
+    };
+  }, [climate.id]);
+
+  const toggleSound = () => {
+    if (!audioContextRef.current) {
+      initAudio();
+      setSoundEnabled(true);
+    } else {
+      setSoundEnabled(!soundEnabled);
+    }
+  };
+
+  if (climate.conditions.length === 0) {
+    return <Empty description="暂无气候数据" />;
+  }
 
   const condition: ClimateCondition = climate.conditions[currentConditionIdx];
   const fogOpacity = condition.fogLevel / 100 * 0.7;
@@ -478,8 +675,8 @@ const ClimateSimulationPanel = ({ climate }: { climate: ClimateSimulation }) => 
             {isPlaying ? '暂停' : '播放时序'}
           </Button>
           <Button
-            icon={<SoundOutlined />}
-            onClick={() => setSoundEnabled(!soundEnabled)}
+            icon={soundEnabled ? <SoundOutlined /> : <SoundOutlined />}
+            onClick={toggleSound}
             type={soundEnabled ? 'primary' : 'default'}
             ghost
           >
@@ -535,18 +732,36 @@ const ClimateSimulationPanel = ({ climate }: { climate: ClimateSimulation }) => 
         <Divider style={{ margin: '8px 0', borderColor: 'rgba(245,230,200,0.2)' }} />
 
         <Space size={[4, 4]} wrap>
-          {climate.ambientSounds.map(sound => (
-            <Tag
-              key={sound.id}
-              icon={<span>{SOUND_ICONS[sound.type]}</span>}
-              color="geekblue"
-              style={{ opacity: soundEnabled ? sound.intensity * 0.5 + 0.5 : 0.3, fontSize: 12 }}
-            >
-              {sound.name}
-              {sound.direction && <Text style={{ color: '#a89880', marginLeft: 4, fontSize: 10 }}>· {sound.direction}</Text>}
-            </Tag>
-          ))}
+          {climate.ambientSounds.map(sound => {
+            const isActive = soundEnabled;
+            return (
+              <Tag
+                key={sound.id}
+                icon={<span>{SOUND_ICONS[sound.type]}</span>}
+                color={isActive ? 'geekblue' : 'default'}
+                style={{
+                  opacity: soundEnabled ? sound.intensity * 0.5 + 0.5 : 0.3,
+                  fontSize: 12,
+                  transition: 'opacity 0.5s ease'
+                }}
+              >
+                {sound.name}
+                {sound.direction && <Text style={{ color: '#a89880', marginLeft: 4, fontSize: 10 }}>· {sound.direction}</Text>}
+              </Tag>
+            );
+          })}
         </Space>
+
+        {!soundEnabled && !audioReady && (
+          <Text type="secondary" style={{ fontSize: 11, display: 'block', marginTop: 6, color: '#a89880' }}>
+            点击「环境音关」按钮可开启沉浸式环境音效
+          </Text>
+        )}
+        {soundEnabled && (
+          <Text type="success" style={{ fontSize: 11, display: 'block', marginTop: 6, color: '#27ae60' }}>
+            🔊 环境音已开启 — 闭上眼，聆听山河的呼吸
+          </Text>
+        )}
       </div>
 
       <style>{`
