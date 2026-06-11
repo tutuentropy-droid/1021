@@ -33,6 +33,7 @@ const CATEGORY_CONFIG: Record<FormulaCategory, { label: string; icon: string; co
 const DYNASTY_COLORS: Record<string, string> = {
   'wei-jin': '#7f8c8d',
   'five-dynasties': '#d35400',
+  'tang': '#e67e22',
   'song': '#2980b9',
   'yuan': '#27ae60',
   'ming': '#c0392b',
@@ -43,6 +44,7 @@ const DYNASTY_COLORS: Record<string, string> = {
 const DYNASTY_NAMES: Record<string, string> = {
   'wei-jin': '魏晋',
   'five-dynasties': '五代',
+  'tang': '唐',
   'song': '宋',
   'yuan': '元',
   'ming': '明',
@@ -199,14 +201,17 @@ function FormulaGenealogyPage({ onNavigate }: GenealogyPageProps) {
       ]);
       setCurrentQuestionIndex(prev => Math.min(prev + 1, selectedElement.aiGuide.questions.length));
     } else {
-      setAiMessages(prev => [
-        ...prev,
-        {
-          id: 'conclusion',
-          type: 'mentor',
-          content: selectedElement.aiGuide.conclusion
-        }
-      ]);
+      const hasConclusion = aiMessages.some(m => m.id === 'conclusion');
+      if (!hasConclusion) {
+        setAiMessages(prev => [
+          ...prev,
+          {
+            id: 'conclusion',
+            type: 'mentor',
+            content: selectedElement.aiGuide.conclusion
+          }
+        ]);
+      }
     }
   };
 
