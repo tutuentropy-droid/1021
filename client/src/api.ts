@@ -4,7 +4,7 @@ import type {
   RoleplayScenario, RoleplayChoice, RoleplayConsequence, RoleplayResult, ReadingRecommendation,
   LiteraryWork, LiteraryWorkType, TimelineData,
   Exhibition, ExhibitionCreateRequest, ExhibitionPreview, ThemeSuggestion, AISuggestion,
-  ExhibitionSection
+  ExhibitionSection, AbsentEntrySummary, AbsentEntryDetail
 } from './types';
 
 const api = axios.create({
@@ -39,8 +39,17 @@ export const knowledgeApi = {
   getKnowledgeTree: () => api.get<TreeNode[]>('/knowledge-tree').then(r => r.data),
   getStats: () => api.get<Stats>('/stats').then(r => r.data),
   search: (q: string) => api.get('/search', { params: { q } }).then(r => r.data),
-  getKnowledgeGraph: (params?: { painterId?: string; schoolId?: string; paintingId?: string; depth?: number }) =>
+  getKnowledgeGraph: (params?: { painterId?: string; schoolId?: string; paintingId?: string; depth?: number; includeAbsent?: boolean }) =>
     api.get<KnowledgeGraph>('/knowledge-graph', { params: params || {} }).then(r => r.data),
+
+  getAbsentEntries: (params?: { dynastyId?: string; type?: string; status?: string; painterId?: string }) =>
+    api.get<AbsentEntrySummary[]>('/absent-entries', { params: params || {} }).then(r => r.data),
+
+  getAbsentEntry: (id: string) =>
+    api.get<AbsentEntryDetail>(`/absent-entries/${id}`).then(r => r.data),
+
+  getPainterAbsentEntries: (painterId: string) =>
+    api.get<AbsentEntryDetail[]>(`/painters/${painterId}/absent-entries`).then(r => r.data),
 
   getRoleplayScenarios: () => api.get<any[]>('/roleplay-scenarios').then(r => r.data),
   getRoleplayScenario: (id: string) => api.get<RoleplayScenario>(`/roleplay-scenarios/${id}`).then(r => r.data),

@@ -354,3 +354,34 @@ export interface ExhibitionPreview {
   isPublished: boolean;
   viewCount: number;
 }
+
+export type AbsentStatus = 'recorded_only' | 'copy_only' | 'lost' | 'destroyed';
+export type AbsentType = 'painter' | 'painting' | 'mural';
+export type FragmentType = 'record' | 'research' | 'lament' | 'colophon';
+
+export interface DocumentFragment {
+  id: string;
+  author: string;
+  authorDynasty?: string;
+  title?: string;
+  year?: string;
+  content: string;
+  translation?: string;
+  type: FragmentType;
+  source: string;
+}
+
+export interface AbsentEntry {
+  id: string;
+  type: AbsentType;
+  name: string;
+  dynastyId: string;
+  attributedPainterId?: string;
+  status: AbsentStatus;
+  description: string;
+  whatWasLost: string;
+  sources: DocumentFragment[];
+  relatedExistingPaintingIds?: string[];
+  relatedExistingPainterIds?: string[];
+  scholarlyDebate?: string;
+}

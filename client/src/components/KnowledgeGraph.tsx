@@ -1,24 +1,30 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { Card, Typography, Tag, Empty, Spin, Button, Space, Select, Row, Col } from 'antd';
-import { ZoomInOutlined, ZoomOutOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Card, Typography, Tag, Empty, Spin, Button, Space, Select, Row, Col, Switch, Tooltip } from 'antd';
+import { ZoomInOutlined, ZoomOutOutlined, ReloadOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import type { KnowledgeGraph, KnowledgeGraphNode, KnowledgeGraphEdge } from '../types';
 import { knowledgeApi } from '../api';
 
-const { Title, Paragraph } = Typography;
+const { Title, Paragraph, Text } = Typography;
 const { Option } = Select;
 
 const NODE_COLORS: Record<string, string> = {
   painter: '#8b7355',
   school: '#a0522d',
   painting: '#6b8e23',
-  dynasty: '#4a6b8a'
+  dynasty: '#4a6b8a',
+  absent_painting: '#9e9e9e',
+  absent_painter: '#9e9e9e',
+  absent_mural: '#9e9e9e'
 };
 
 const NODE_ICONS: Record<string, string> = {
   painter: '👨‍🎨',
   school: '🎨',
   painting: '🖼️',
-  dynasty: '🏛️'
+  dynasty: '🏛️',
+  absent_painting: '❓',
+  absent_painter: '❓',
+  absent_mural: '❓'
 };
 
 const EDGE_COLORS: Record<string, string> = {
@@ -28,7 +34,22 @@ const EDGE_COLORS: Record<string, string> = {
   belongsTo: '#2980b9',
   created: '#d35400',
   inherits: '#16a085',
-  successor: '#7f8c8d'
+  successor: '#7f8c8d',
+  absent_record: '#b22222',
+  absent_reference: '#8b7355'
+};
+
+const isAbsentNode = (node: KnowledgeGraphNode) =>
+  node.type?.toString().startsWith('absent_') || node.metadata?.isAbsent;
+
+const getAbsentBaseType = (type: string) =>
+  type.startsWith('absent_') ? type.replace('absent_', '') : type;
+
+const ABSENT_STATUS_LABELS: Record<string, string> = {
+  recorded_only: '只见著录',
+  copy_only: '仅存摹本',
+  lost: '完全失传',
+  destroyed: '毁于兵燹'
 };
 
 interface KnowledgeGraphProps {
@@ -36,6 +57,7 @@ interface KnowledgeGraphProps {
   initialSchoolId?: string;
   initialPaintingId?: string;
   onNodeClick?: (node: KnowledgeGraphNode) => void;
+  onAbsentClick?: (absentId: string) => void;
   height?: number;
 }
 
@@ -53,6 +75,7 @@ function KnowledgeGraphComponent({
   initialSchoolId,
   initialPaintingId,
   onNodeClick,
+  onAbsentClick,
   height = 600
 }: KnowledgeGraphProps) {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -65,14 +88,15 @@ function KnowledgeGraphComponent({
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [depth, setDepth] = useState(2);
   const [filterType, setFilterType] = useState<string | undefined>(undefined);
+  const [includeAbsent, setIncludeAbsent] = useState(true);
 
   useEffect(() => {
     loadGraph();
-  }, [initialPainterId, initialSchoolId, initialPaintingId, depth]);
+  }, [initialPainterId, initialSchoolId, initialPaintingId, depth, includeAbsent]);
 
   const loadGraph = () => {
     setLoading(true);
-    const params: any = { depth };
+    const params: any = { depth, includeAbsent };
     if (initialPainterId) params.painterId = initialPainterId;
     else if (initialSchoolId) params.schoolId = initialSchoolId;
     else if (initialPaintingId) params.paintingId = initialPaintingId;
@@ -85,7 +109,9 @@ function KnowledgeGraphComponent({
     if (!graph) return null;
     if (!filterType) return graph;
     const filteredNodeIds = new Set(
-      graph.nodes.filter(n => n.type === filterType).map(n => n.id)
+      filterType === 'absent'
+        ? graph.nodes.filter(n => isAbsentNode(n)).map(n => n.id)
+        : graph.nodes.filter(n => n.type === filterType).map(n => n.id)
     );
     const connectedNodeIds = new Set(filteredNodeIds);
     graph.edges.forEach(e => {
@@ -249,7 +275,21 @@ function KnowledgeGraphComponent({
                 <Option value="school">画派</Option>
                 <Option value="painting">画作</Option>
                 <Option value="dynasty">朝代</Option>
+                <Option value="absent">空白（阙如）</Option>
               </Select>
+              <Tooltip title="显示画史中的'缺席'节点——失传名作、毁佚壁画等">
+                <Space size={4} style={{ marginLeft: 4 }}>
+                  <EyeInvisibleOutlined style={{ color: includeAbsent ? '#8b7355' : '#c0c0c0', fontSize: 14 }} />
+                  <Switch
+                    size="small"
+                    checked={includeAbsent}
+                    onChange={setIncludeAbsent}
+                  />
+                  <Text style={{ fontSize: 12, color: includeAbsent ? '#5c4a33' : '#a89880' }}>
+                    阙如
+                  </Text>
+                </Space>
+              </Tooltip>
               <Select
                 size="small"
                 style={{ width: 100 }}
@@ -264,9 +304,9 @@ function KnowledgeGraphComponent({
           </Col>
           <Col xs={24} md={16} style={{ textAlign: 'right' }}>
             <Space wrap size={[8, 4]}>
-              {Object.entries(NODE_ICONS).map(([type, icon]) => (
+              {(['painter', 'school', 'painting', 'dynasty'] as const).map((type) => (
                 <Tag key={type} color={NODE_COLORS[type]} style={{ margin: 0 }}>
-                  {icon} {{
+                  {NODE_ICONS[type]} {{
                     painter: '画家',
                     school: '画派',
                     painting: '画作',
@@ -274,6 +314,18 @@ function KnowledgeGraphComponent({
                   }[type]}
                 </Tag>
               ))}
+              {includeAbsent && (
+                <Tag
+                  style={{
+                    margin: 0,
+                    background: '#f5f5f5',
+                    color: '#757575',
+                    border: '1px dashed #9e9e9e'
+                  }}
+                >
+                  ❓ 阙如（失传/毁佚）
+                </Tag>
+              )}
             </Space>
           </Col>
         </Row>
@@ -329,16 +381,19 @@ function KnowledgeGraphComponent({
             </defs>
             <rect width="100%" height={height} fill="transparent" />
             <g transform={`translate(${offset.x}, ${offset.y}) scale(${scale})`}>
-              {edgePaths.map((ep: any) => (
-                <g key={ep.id}>
-                  <path
-                    d={ep.path}
-                    fill="none"
-                    stroke={EDGE_COLORS[ep.edge.type] || '#999'}
-                    strokeWidth={ep.edge.type === 'teacher' || ep.edge.type === 'student' ? 2 : 1.5}
-                    strokeOpacity={selectedNode && ep.edge.source !== selectedNode.id && ep.edge.target !== selectedNode.id ? 0.2 : 0.7}
-                    markerEnd={`url(#arrow-${ep.edge.type})`}
-                  />
+              {edgePaths.map((ep: any) => {
+                const isAbsentEdge = ep.edge.type?.startsWith('absent_');
+                return (
+                  <g key={ep.id}>
+                    <path
+                      d={ep.path}
+                      fill="none"
+                      stroke={EDGE_COLORS[ep.edge.type] || '#999'}
+                      strokeWidth={ep.edge.type === 'teacher' || ep.edge.type === 'student' ? 2 : 1.5}
+                      strokeOpacity={selectedNode && ep.edge.source !== selectedNode.id && ep.edge.target !== selectedNode.id ? 0.2 : (isAbsentEdge ? 0.55 : 0.7)}
+                      strokeDasharray={isAbsentEdge ? '6 4' : undefined}
+                      markerEnd={`url(#arrow-${isAbsentEdge ? 'absent' : ep.edge.type})`}
+                    />
                   {(!selectedNode || ep.edge.source === selectedNode.id || ep.edge.target === selectedNode.id) && (
                     <text
                       x={ep.midX}
@@ -358,44 +413,76 @@ function KnowledgeGraphComponent({
                       {ep.edge.label}
                     </text>
                   )}
-                </g>
-              ))}
+                  </g>
+                );
+              })}
               {positions.map(node => {
                 const isSelected = selectedNode?.id === node.id;
+                const isAbsent = isAbsentNode(node);
                 const isDimmed = selectedNode && !isSelected &&
                   !displayGraph.edges.some(e =>
                     (e.source === selectedNode.id && e.target === node.id) ||
                     (e.target === selectedNode.id && e.source === node.id)
                   );
+                const baseR = node.type === 'painter' ? 38 : node.type === 'school' ? 34 : 30;
+                const nodeColor = isAbsent ? '#f5f5f5' : NODE_COLORS[node.type];
                 return (
                   <g
                     key={node.id}
                     transform={`translate(${node.x}, ${node.y})`}
                     style={{ cursor: 'pointer', opacity: isDimmed ? 0.35 : 1 }}
-                    onClick={(e) => { e.stopPropagation(); handleNodeClick(node); }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleNodeClick(node);
+                      if (isAbsent && onAbsentClick) {
+                        onAbsentClick(node.id);
+                      }
+                    }}
                     filter={isSelected ? 'url(#glow)' : undefined}
                   >
-                    <circle
-                      r={node.type === 'painter' ? 38 : node.type === 'school' ? 34 : 30}
-                      fill={NODE_COLORS[node.type]}
-                      stroke={isSelected ? '#d4af37' : '#fdfbf7'}
-                      strokeWidth={isSelected ? 4 : 3}
-                      opacity={0.92}
-                    />
+                    {isAbsent ? (
+                      <>
+                        <circle
+                          r={baseR}
+                          fill="#fafafa"
+                          stroke="#9e9e9e"
+                          strokeWidth={2.5}
+                          strokeDasharray="5 3"
+                          opacity={0.88}
+                        />
+                        <circle
+                          r={baseR - 8}
+                          fill="none"
+                          stroke="#bdbdbd"
+                          strokeWidth={1}
+                          strokeDasharray="3 2"
+                          opacity={0.6}
+                        />
+                      </>
+                    ) : (
+                      <circle
+                        r={baseR}
+                        fill={nodeColor}
+                        stroke={isSelected ? '#d4af37' : '#fdfbf7'}
+                        strokeWidth={isSelected ? 4 : 3}
+                        opacity={0.92}
+                      />
+                    )}
                     <text
                       y={-4}
                       textAnchor="middle"
                       fontSize="18"
                       style={{ pointerEvents: 'none' }}
                     >
-                      {NODE_ICONS[node.type]}
+                      {isAbsent ? '❓' : NODE_ICONS[node.type]}
                     </text>
                     <text
                       y={14}
                       textAnchor="middle"
                       fontSize={node.name.length > 4 ? 10 : 12}
-                      fill="#fdfbf7"
+                      fill={isAbsent ? '#616161' : '#fdfbf7'}
                       fontWeight="bold"
+                      fontStyle={isAbsent ? 'italic' : 'normal'}
                       style={{ pointerEvents: 'none' }}
                     >
                       {node.name.length > 5 ? node.name.slice(0, 5) : node.name}
@@ -412,48 +499,116 @@ function KnowledgeGraphComponent({
       </Card>
 
       {selectedNode && (
-        <Card className="card-shadow" style={{ borderRadius: 16, marginTop: 16 }}>
-          <Tag color={NODE_COLORS[selectedNode.type]} style={{ marginBottom: 12 }}>
-            {NODE_ICONS[selectedNode.type]} {{
-              painter: '画家',
-              school: '画派',
-              painting: '画作',
-              dynasty: '朝代'
-            }[selectedNode.type]}
-          </Tag>
-          <Title level={4} className="ink-title" style={{ color: '#5c4a33', marginTop: 0 }}>
-            {selectedNode.name}
-          </Title>
-          {selectedNode.description && (
-            <Paragraph style={{ color: '#6b5b45' }}>
-              {selectedNode.description}
-            </Paragraph>
-          )}
-          {selectedNode.metadata && Object.keys(selectedNode.metadata).length > 0 && (
-            <div style={{ marginTop: 12 }}>
-              {Object.entries(selectedNode.metadata).map(([k, v]) => (
-                v ? (
-                  <Tag key={k} style={{ marginBottom: 4 }}>
-                    {{
-                      years: '生卒',
-                      artName: '字号'
-                    }[k] || k}: {String(v)}
-                  </Tag>
-                ) : null
-              ))}
-            </div>
-          )}
-          {selectedNode.type === 'painter' && (
-            <div style={{ marginTop: 12 }}>
-              <Button
-                type="primary"
-                size="small"
-                onClick={() => onNodeClick?.(selectedNode)}
-                style={{ background: '#8b7355', borderColor: '#8b7355' }}
+        <Card
+          className="card-shadow"
+          style={{
+            borderRadius: 16,
+            marginTop: 16,
+            border: isAbsentNode(selectedNode) ? '2px dashed #bdbdbd' : undefined
+          }}
+        >
+          {isAbsentNode(selectedNode) ? (
+            <>
+              <Tag
+                style={{
+                  marginBottom: 12,
+                  background: '#f5f5f5',
+                  color: '#616161',
+                  border: '1px dashed #9e9e9e'
+                }}
               >
-                查看画家详情
-              </Button>
-            </div>
+                ❓ 阙如 · {{
+                  absent_painting: '失传画作',
+                  absent_painter: '失传作品',
+                  absent_mural: '毁佚壁画'
+                }[selectedNode.type as string] || '历史空白'}
+              </Tag>
+              <Title level={4} className="ink-title" style={{ color: '#5c4a33', marginTop: 0, fontStyle: 'italic' }}>
+                {selectedNode.name}
+              </Title>
+              {selectedNode.metadata?.status && (
+                <Tag
+                  color={
+                    selectedNode.metadata.status === 'destroyed' ? '#b22222'
+                    : selectedNode.metadata.status === 'lost' ? '#a0522d'
+                    : selectedNode.metadata.status === 'copy_only' ? '#6b8e23'
+                    : '#8b7355'
+                  }
+                  style={{ marginBottom: 12 }}
+                >
+                  {ABSENT_STATUS_LABELS[selectedNode.metadata.status as string] || selectedNode.metadata.status}
+                </Tag>
+              )}
+              {selectedNode.description && (
+                <Paragraph style={{ color: '#6b5b45', fontStyle: 'italic' }}>
+                  <EyeInvisibleOutlined style={{ marginRight: 6 }} />
+                  {selectedNode.description}
+                </Paragraph>
+              )}
+              {selectedNode.metadata?.sourceCount && (
+                <Text type="secondary" style={{ display: 'block', marginBottom: 12 }}>
+                  围绕此"缺席"，已整理 {selectedNode.metadata.sourceCount} 则历代追忆、考据与感叹的文献
+                </Text>
+              )}
+              <div style={{ marginTop: 12 }}>
+                <Button
+                  type="primary"
+                  size="small"
+                  onClick={() => onAbsentClick?.(selectedNode.id)}
+                  style={{
+                    background: 'linear-gradient(135deg, #8b7355 0%, #a0522d 100%)',
+                    border: 'none'
+                  }}
+                >
+                  <EyeInvisibleOutlined /> 进入阙如录详页
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <Tag color={NODE_COLORS[selectedNode.type]} style={{ marginBottom: 12 }}>
+                {NODE_ICONS[selectedNode.type]} {{
+                  painter: '画家',
+                  school: '画派',
+                  painting: '画作',
+                  dynasty: '朝代'
+                }[selectedNode.type]}
+              </Tag>
+              <Title level={4} className="ink-title" style={{ color: '#5c4a33', marginTop: 0 }}>
+                {selectedNode.name}
+              </Title>
+              {selectedNode.description && (
+                <Paragraph style={{ color: '#6b5b45' }}>
+                  {selectedNode.description}
+                </Paragraph>
+              )}
+              {selectedNode.metadata && Object.keys(selectedNode.metadata).length > 0 && (
+                <div style={{ marginTop: 12 }}>
+                  {Object.entries(selectedNode.metadata).map(([k, v]) => (
+                    !k.startsWith('isAbsent') && !k.startsWith('absentType') && v ? (
+                      <Tag key={k} style={{ marginBottom: 4 }}>
+                        {{
+                          years: '生卒',
+                          artName: '字号'
+                        }[k] || k}: {String(v)}
+                      </Tag>
+                    ) : null
+                  ))}
+                </div>
+              )}
+              {selectedNode.type === 'painter' && (
+                <div style={{ marginTop: 12 }}>
+                  <Button
+                    type="primary"
+                    size="small"
+                    onClick={() => onNodeClick?.(selectedNode)}
+                    style={{ background: '#8b7355', borderColor: '#8b7355' }}
+                  >
+                    查看画家详情
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </Card>
       )}

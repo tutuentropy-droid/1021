@@ -141,6 +141,45 @@ export interface Stats {
   theories: number;
   flashcards: number;
   literaryWorks: number;
+  absentEntries: number;
+}
+
+export type AbsentStatus = 'recorded_only' | 'copy_only' | 'lost' | 'destroyed';
+export type AbsentType = 'painter' | 'painting' | 'mural';
+export type FragmentType = 'record' | 'research' | 'lament' | 'colophon';
+
+export interface DocumentFragment {
+  id: string;
+  author: string;
+  authorDynasty?: string;
+  title?: string;
+  year?: string;
+  content: string;
+  translation?: string;
+  type: FragmentType;
+  source: string;
+}
+
+export interface AbsentEntrySummary {
+  id: string;
+  type: AbsentType;
+  name: string;
+  dynastyId: string;
+  attributedPainterId?: string;
+  status: AbsentStatus;
+  description: string;
+  whatWasLost: string;
+  sourceCount: number;
+  relatedExistingPaintingIds?: string[];
+  relatedExistingPainterIds?: string[];
+}
+
+export interface AbsentEntryDetail extends AbsentEntrySummary {
+  sources: DocumentFragment[];
+  scholarlyDebate?: string;
+  dynasty?: Dynasty;
+  attributedPainter?: Painter;
+  relatedPaintings?: Painting[];
 }
 
 export interface ChatMessage {

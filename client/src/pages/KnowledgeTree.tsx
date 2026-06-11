@@ -1033,6 +1033,10 @@ function KnowledgeTree({ onNavigate, initialPainterId, onInitialPainterConsumed 
             initialSchoolId={graphSource.type === 'school' ? graphSource.id : undefined}
             initialPaintingId={graphSource.type === 'painting' ? graphSource.id : undefined}
             height={560}
+            onAbsentClick={(absentId) => {
+              setKnowledgeGraphVisible(false);
+              onNavigate('absent', absentId);
+            }}
           />
         )}
       </Modal>

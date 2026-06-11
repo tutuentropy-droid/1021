@@ -1,4 +1,4 @@
-import { Card, Row, Col, Statistic, Button, Typography, Empty } from 'antd';
+import { Card, Row, Col, Statistic, Button, Typography, Empty, Divider } from 'antd';
 import {
   AppstoreOutlined,
   PictureOutlined,
@@ -7,7 +7,8 @@ import {
   BookOutlined,
   ArrowRightOutlined,
   BulbOutlined,
-  FundProjectionScreenOutlined
+  FundProjectionScreenOutlined,
+  EyeInvisibleOutlined
 } from '@ant-design/icons';
 import type { Stats } from '../types';
 
@@ -146,6 +147,20 @@ function HomePage({ stats, onNavigate }: HomePageProps) {
             <Statistic title="知识卡片" value={stats.flashcards} suffix="张" valueStyle={{ color: '#8b7355' }} />
           </Card>
         </Col>
+        <Col xs={12} sm={8} md={4}>
+          <Card
+            className="card-shadow"
+            style={{ textAlign: 'center', borderRadius: 12, background: '#fdf5ef', border: '1px dashed #c4a87a' }}
+          >
+            <Statistic
+              title={<span style={{ fontStyle: 'italic' }}>画史阙如</span>}
+              value={stats.absentEntries || 0}
+              suffix="项"
+              valueStyle={{ color: '#a0522d' }}
+              prefix={<EyeInvisibleOutlined />}
+            />
+          </Card>
+        </Col>
       </Row>
 
       <Title level={3} className="ink-title" style={{ marginBottom: 24 }}>
@@ -176,8 +191,115 @@ function HomePage({ stats, onNavigate }: HomePageProps) {
         ))}
       </Row>
 
+      <Divider style={{ margin: '40px 0 32px 0' }} />
+
+      <Card
+        className="card-shadow"
+        style={{
+          borderRadius: 20,
+          marginBottom: 32,
+          background: 'linear-gradient(135deg, #fdf5ef 0%, #f8ede0 100%)',
+          border: '2px dashed #c4a87a',
+          overflow: 'hidden'
+        }}
+        bodyStyle={{ padding: 0 }}
+      >
+        <Row gutter={0}>
+          <Col xs={24} md={17}>
+            <div style={{ padding: '36px 40px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                <span
+                  style={{
+                    fontSize: 40,
+                    filter: 'grayscale(0.3) opacity(0.75)',
+                    display: 'inline-block'
+                  }}
+                >
+                  ❓
+                </span>
+                <div>
+                  <Title level={3} style={{ margin: 0, color: '#5c4a33' }} className="ink-title">
+                    阙如录 · 画史中的缺席场域
+                  </Title>
+                  <Paragraph style={{ margin: '6px 0 0 0', color: '#8b7355', fontSize: 13, fontStyle: 'italic' }}>
+                    "君子于其所不知，盖阙如也" ——《论语·子路》
+                  </Paragraph>
+                </div>
+              </div>
+
+              <Paragraph style={{ color: '#6b5b45', lineHeight: 1.9, marginBottom: 16, fontSize: 15 }}>
+                王维的真迹、顾恺之的原作、吴道子的三百壁壁画……
+                在千年兵燹与岁月流转中，无数名作已成过眼云烟。
+              </Paragraph>
+              <Paragraph style={{ color: '#6b5b45', lineHeight: 1.9, marginBottom: 24, fontSize: 15 }}>
+                系统不虚构这些空白的面貌，而是整理历代<span style={{ color: '#a0522d', fontWeight: 500 }}>追忆</span>、
+                <span style={{ color: '#6b8e23', fontWeight: 500 }}>考据</span>与
+                <span style={{ color: '#4a6b8a', fontWeight: 500 }}>感叹</span>的文献片段，
+                让"缺席"本身成为一种可感知的历史存在——每一段空白，
+                都是一道通往更辽阔想象世界的门扉。
+              </Paragraph>
+
+              <Button
+                type="primary"
+                size="large"
+                icon={<EyeInvisibleOutlined />}
+                onClick={() => onNavigate('absent')}
+                style={{
+                  background: 'linear-gradient(135deg, #8b7355 0%, #a0522d 100%)',
+                  border: 'none',
+                  borderRadius: 10,
+                  padding: '0 28px'
+                }}
+              >
+                进入阙如录
+              </Button>
+            </div>
+          </Col>
+          <Col xs={24} md={7} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div
+              style={{
+                width: 160,
+                height: 200,
+                border: '2px dashed #bdbdbd',
+                borderRadius: 12,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'rgba(255,255,255,0.6)',
+                position: 'relative',
+                transform: 'rotate(-3deg)'
+              }}
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  top: -12,
+                  left: 12,
+                  padding: '2px 10px',
+                  background: '#fff',
+                  border: '1px solid #d4c4a8',
+                  borderRadius: 4,
+                  fontSize: 11,
+                  color: '#a89880',
+                  transform: 'rotate(-5deg)'
+                }}
+                >
+                  真迹失传
+                </div>
+                <div style={{ textAlign: 'center', color: '#9e9e9e' }}>
+                  <div style={{ fontSize: 48, marginBottom: 8, fontStyle: 'italic' }}>?</div>
+                  <div style={{ fontSize: 12, fontStyle: 'italic' }}>唯存追忆</div>
+                  <div style={{ fontSize: 12, marginTop: 20, fontStyle: 'italic', color: '#bdbdbd' }}>
+                    — 文献在场 —
+                  </div>
+                </div>
+              </div>
+            </Col>
+        </Row>
+      </Card>
+
       <div style={{
-        marginTop: 32,
+        marginTop: 8,
         padding: 32,
         background: '#fff',
         borderRadius: 16,

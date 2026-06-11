@@ -8,6 +8,7 @@ import { scenarios } from './scenarios';
 import { readings } from './readings';
 import { literaryWorks } from './literaryWorks';
 import { getTimelineData } from './timeline';
+import { absentEntries } from './absentEntries';
 import {
   getThemeSuggestions,
   createExhibition,
@@ -24,6 +25,7 @@ import {
 
 export { 
   dynasties, schools, painters, paintings, theories, flashcards, scenarios, readings, literaryWorks, getTimelineData,
+  absentEntries,
   getThemeSuggestions, createExhibition, updateExhibition, getExhibition, getExhibitionWithPaintings,
   getExhibitionList, deleteExhibition, publishExhibition, getExhibitionByShareCode, getAISuggestions, exhibitions
 };
