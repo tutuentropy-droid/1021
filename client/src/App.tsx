@@ -30,6 +30,7 @@ type PageType = 'home' | 'tree' | 'gallery' | 'flashcards' | 'chat' | 'theories'
 function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [galleryPaintingId, setGalleryPaintingId] = useState<string | null>(null);
+  const [treePainterId, setTreePainterId] = useState<string | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -51,15 +52,22 @@ function App() {
     { key: 'roleplay', icon: <ThunderboltOutlined />, label: '画史推演' }
   ];
 
-  const handleNavigate = (page: string, paintingId?: string) => {
+  const handleNavigate = (page: string, id?: string) => {
     setCurrentPage(page as PageType);
-    if (page === 'gallery' && paintingId) {
-      setGalleryPaintingId(paintingId);
+    if (page === 'gallery' && id) {
+      setGalleryPaintingId(id);
+    }
+    if (page === 'tree' && id) {
+      setTreePainterId(id);
     }
   };
 
   const handleGalleryPaintingConsumed = useCallback(() => {
     setGalleryPaintingId(null);
+  }, []);
+
+  const handleTreePainterConsumed = useCallback(() => {
+    setTreePainterId(null);
   }, []);
 
   const renderPage = () => {
@@ -75,7 +83,13 @@ function App() {
       case 'home':
         return <HomePage stats={stats} onNavigate={handleNavigate} />;
       case 'tree':
-        return <KnowledgeTree onNavigate={handleNavigate} />;
+        return (
+          <KnowledgeTree
+            onNavigate={handleNavigate}
+            initialPainterId={treePainterId}
+            onInitialPainterConsumed={handleTreePainterConsumed}
+          />
+        );
       case 'gallery':
         return (
           <GalleryPage

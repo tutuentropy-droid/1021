@@ -54,6 +54,8 @@ const LITERARY_TYPE_COLORS: Record<string, string> = {
 
 interface KnowledgeTreeProps {
   onNavigate: (page: string, paintingId?: string) => void;
+  initialPainterId?: string | null;
+  onInitialPainterConsumed?: () => void;
 }
 
 const THEME_ICONS: Record<string, string> = {
@@ -74,7 +76,7 @@ function parseNodeKey(key: string): { type: string; id: string } | null {
   };
 }
 
-function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
+function KnowledgeTree({ onNavigate, initialPainterId, onInitialPainterConsumed }: KnowledgeTreeProps) {
   const [tree, setTree] = useState<TreeNode[]>([]);
   const [dynasties, setDynasties] = useState<Dynasty[]>([]);
   const [schools, setSchools] = useState<School[]>([]);
@@ -190,6 +192,16 @@ function KnowledgeTree({ onNavigate }: KnowledgeTreeProps) {
         setSelectedData(null);
     }
   };
+
+  useEffect(() => {
+    if (initialPainterId && painters.length > 0) {
+      const painter = painters.find(p => p.id === initialPainterId);
+      if (painter) {
+        selectNode('painter', initialPainterId);
+      }
+      onInitialPainterConsumed?.();
+    }
+  }, [initialPainterId, painters]);
 
   const handleSelect = (keys: React.Key[]) => {
     if (keys.length === 0) {

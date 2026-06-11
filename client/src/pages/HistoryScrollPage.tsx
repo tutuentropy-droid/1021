@@ -109,11 +109,42 @@ function HistoryScrollPage({ onNavigate }: HistoryScrollPageProps) {
   }, [timelineData, activeDynastyId, viewMode, displayEvents]);
 
   const CHART_WIDTH = 100;
-  const CHART_HEIGHT = 560;
+  const CHART_HEIGHT = 720;
   const YEAR_TO_PX = (year: number) => {
     const { min, max } = timeRange;
     return ((year - min) / (max - min)) * (CHART_WIDTH * 30 - 100) + 50;
   };
+
+  const eventStackingOffsets = useMemo(() => {
+    const map = new Map<string, number>();
+    const THRESHOLD_PX = 26;
+    EVENT_LANES.forEach((laneTypes, laneIdx) => {
+      const laneEvents = displayEvents.filter(e => laneTypes.includes(e.type)).sort((a, b) => a.year - b.year);
+      const rowAssignments: number[] = [];
+      const rowLastX: number[] = [];
+      laneEvents.forEach(ev => {
+        const x = YEAR_TO_PX(ev.year);
+        let assignedRow = -1;
+        for (let r = 0; r < rowLastX.length; r++) {
+          if (x - rowLastX[r] >= THRESHOLD_PX) {
+            assignedRow = r;
+            break;
+          }
+        }
+        if (assignedRow === -1) {
+          assignedRow = rowLastX.length;
+          rowLastX.push(x);
+        } else {
+          rowLastX[assignedRow] = x;
+        }
+        rowAssignments.push(assignedRow);
+      });
+      laneEvents.forEach((ev, i) => {
+        map.set(`${laneIdx}-${ev.id}`, rowAssignments[i]);
+      });
+    });
+    return map;
+  }, [displayEvents, timeRange]);
 
   if (loading) {
     return (
@@ -135,7 +166,6 @@ function HistoryScrollPage({ onNavigate }: HistoryScrollPageProps) {
   };
 
   const renderSpatialMap = () => {
-    if (!showMap) return null;
     const locationEvents = displayEvents.filter(e => e.location);
     return (
       <Card
@@ -161,129 +191,136 @@ function HistoryScrollPage({ onNavigate }: HistoryScrollPageProps) {
         }
         bodyStyle={{ padding: 0 }}
       >
-        <div
-          style={{
-            height: 280,
-            position: 'relative',
-            background: `
+        {showMap ? (
+          <div
+            style={{
+              height: 280,
+              position: 'relative',
+              background: `
               linear-gradient(135deg, rgba(139,115,85,0.05) 0%, rgba(200,180,140,0.08) 100%),
               radial-gradient(ellipse at 30% 40%, rgba(74,107,138,0.15) 0%, transparent 40%),
               radial-gradient(ellipse at 70% 60%, rgba(107,142,35,0.12) 0%, transparent 35%)
             `,
-            overflow: 'hidden'
-          }}
-        >
-          <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'absolute', top: 0, left: 0 }}>
-            <path
-              d="M 15,35 Q 25,20 45,28 T 70,30 Q 85,35 80,55 Q 75,80 55,82 Q 35,85 25,70 Q 15,55 15,35 Z"
-              fill="none"
-              stroke="rgba(139,115,85,0.2)"
-              strokeWidth="0.3"
-              strokeDasharray="1,1"
-            />
-            <path
-              d="M 40,45 Q 55,50 60,65"
-              fill="none"
-              stroke="rgba(74,107,138,0.3)"
-              strokeWidth="0.5"
-            />
-            <path
-              d="M 25,55 Q 40,60 50,70"
-              fill="none"
-              stroke="rgba(74,107,138,0.3)"
-              strokeWidth="0.4"
-            />
-            {[
-              { x: 30, y: 40, name: '长安' },
-              { x: 54, y: 40, name: '汴京' },
-              { x: 70, y: 55, name: '临安' },
-              { x: 69, y: 54, name: '苏州' },
-              { x: 71, y: 53, name: '松江' }
-            ].map((city, i) => (
-              <g key={i}>
-                <circle cx={city.x} cy={city.y} r="0.8" fill="rgba(139,115,85,0.4)" />
-                <text x={city.x + 1.5} y={city.y + 0.5} fontSize="2.2" fill="rgba(92,74,51,0.6)" fontFamily="STKaiti, KaiTi, serif">
-                  {city.name}
-                </text>
-              </g>
-            ))}
-          </svg>
+              overflow: 'hidden'
+            }}
+          >
+            <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ position: 'absolute', top: 0, left: 0 }}>
+              <path
+                d="M 15,35 Q 25,20 45,28 T 70,30 Q 85,35 80,55 Q 75,80 55,82 Q 35,85 25,70 Q 15,55 15,35 Z"
+                fill="none"
+                stroke="rgba(139,115,85,0.2)"
+                strokeWidth="0.3"
+                strokeDasharray="1,1"
+              />
+              <path
+                d="M 40,45 Q 55,50 60,65"
+                fill="none"
+                stroke="rgba(74,107,138,0.3)"
+                strokeWidth="0.5"
+              />
+              <path
+                d="M 25,55 Q 40,60 50,70"
+                fill="none"
+                stroke="rgba(74,107,138,0.3)"
+                strokeWidth="0.4"
+              />
+              {[
+                { x: 30, y: 40, name: '长安' },
+                { x: 54, y: 40, name: '汴京' },
+                { x: 70, y: 55, name: '临安' },
+                { x: 69, y: 54, name: '苏州' },
+                { x: 71, y: 53, name: '松江' }
+              ].map((city, i) => (
+                <g key={i}>
+                  <circle cx={city.x} cy={city.y} r="0.8" fill="rgba(139,115,85,0.4)" />
+                  <text x={city.x + 1.5} y={city.y + 0.5} fontSize="2.2" fill="rgba(92,74,51,0.6)" fontFamily="STKaiti, KaiTi, serif">
+                    {city.name}
+                  </text>
+                </g>
+              ))}
+            </svg>
 
-          {locationEvents.map(event => {
-            if (!event.location) return null;
-            const isHovered = hoveredEventId === event.id;
-            const isSelected = selectedEvent?.id === event.id;
-            const cfg = EVENT_TYPE_CONFIG[event.type];
-            return (
-              <Tooltip
-                key={event.id}
-                title={
-                  <div style={{ maxWidth: 240 }}>
-                    <div style={{ fontWeight: 'bold', marginBottom: 4 }}>{cfg.icon} {event.title}</div>
-                    <div style={{ fontSize: 12, opacity: 0.85 }}>{event.yearDisplay}</div>
-                    <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>{event.location?.name}</div>
-                  </div>
-                }
-              >
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: `${event.location.x}%`,
-                    top: `${event.location.y}%`,
-                    transform: 'translate(-50%, -50%)',
-                    cursor: 'pointer',
-                    zIndex: isHovered || isSelected ? 10 : 1
-                  }}
-                  onMouseEnter={() => setHoveredEventId(event.id)}
-                  onMouseLeave={() => setHoveredEventId(null)}
-                  onClick={() => handleEventClick(event)}
+            {locationEvents.map(event => {
+              if (!event.location) return null;
+              const isHovered = hoveredEventId === event.id;
+              const isSelected = selectedEvent?.id === event.id;
+              const cfg = EVENT_TYPE_CONFIG[event.type];
+              return (
+                <Tooltip
+                  key={event.id}
+                  title={
+                    <div style={{ maxWidth: 240 }}>
+                      <div style={{ fontWeight: 'bold', marginBottom: 4 }}>{cfg.icon} {event.title}</div>
+                      <div style={{ fontSize: 12, opacity: 0.85 }}>{event.yearDisplay}</div>
+                      <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>{event.location?.name}</div>
+                    </div>
+                  }
                 >
                   <div
                     style={{
-                      width: isHovered || isSelected ? 20 : 14,
-                      height: isHovered || isSelected ? 20 : 14,
-                      borderRadius: '50%',
-                      background: cfg.color,
-                      border: `2px solid ${isSelected ? '#d4af37' : '#fdfbf7'}`,
-                      boxShadow: isHovered || isSelected
-                        ? `0 0 0 4px ${cfg.color}33, 0 4px 12px rgba(0,0,0,0.2)`
-                        : '0 2px 6px rgba(0,0,0,0.15)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: isHovered || isSelected ? 11 : 9,
-                      transition: 'all 0.2s ease'
+                      position: 'absolute',
+                      left: `${event.location.x}%`,
+                      top: `${event.location.y}%`,
+                      transform: 'translate(-50%, -50%)',
+                      cursor: 'pointer',
+                      zIndex: isHovered || isSelected ? 10 : 1
                     }}
+                    onMouseEnter={() => setHoveredEventId(event.id)}
+                    onMouseLeave={() => setHoveredEventId(null)}
+                    onClick={() => handleEventClick(event)}
                   >
-                    {cfg.icon}
-                  </div>
-                  {(isHovered || isSelected) && (
                     <div
                       style={{
-                        position: 'absolute',
-                        top: '100%',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        marginTop: 6,
-                        whiteSpace: 'nowrap',
-                        fontSize: 11,
-                        color: '#5c4a33',
-                        fontWeight: 600,
-                        background: 'rgba(253,251,247,0.95)',
-                        padding: '2px 8px',
-                        borderRadius: 4,
-                        border: '1px solid #d4c4a8',
-                        fontFamily: 'STKaiti, KaiTi, serif'
+                        width: isHovered || isSelected ? 20 : 14,
+                        height: isHovered || isSelected ? 20 : 14,
+                        borderRadius: '50%',
+                        background: cfg.color,
+                        border: `2px solid ${isSelected ? '#d4af37' : '#fdfbf7'}`,
+                        boxShadow: isHovered || isSelected
+                          ? `0 0 0 4px ${cfg.color}33, 0 4px 12px rgba(0,0,0,0.2)`
+                          : '0 2px 6px rgba(0,0,0,0.15)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: isHovered || isSelected ? 11 : 9,
+                        transition: 'all 0.2s ease'
                       }}
                     >
-                      {event.location.name}
+                      {cfg.icon}
                     </div>
-                  )}
-                </div>
-              </Tooltip>
-            );
-          })}
-        </div>
+                    {(isHovered || isSelected) && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '100%',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          marginTop: 6,
+                          whiteSpace: 'nowrap',
+                          fontSize: 11,
+                          color: '#5c4a33',
+                          fontWeight: 600,
+                          background: 'rgba(253,251,247,0.95)',
+                          padding: '2px 8px',
+                          borderRadius: 4,
+                          border: '1px solid #d4c4a8',
+                          fontFamily: 'STKaiti, KaiTi, serif'
+                        }}
+                      >
+                        {event.location.name}
+                      </div>
+                    )}
+                  </div>
+                </Tooltip>
+              );
+            })}
+          </div>
+        ) : (
+          <div style={{ padding: 24, textAlign: 'center', color: '#8b7355' }}>
+            <InfoCircleOutlined style={{ fontSize: 28, marginBottom: 8, display: 'block', opacity: 0.5 }} />
+            <Text type="secondary">空间地图已隐藏，点击右上角「显示」可重新展开</Text>
+          </div>
+        )}
       </Card>
     );
   };
@@ -523,7 +560,7 @@ function HistoryScrollPage({ onNavigate }: HistoryScrollPageProps) {
             })}
 
             {LANE_LABELS.map((label, laneIdx) => {
-              const laneY = 80 + laneIdx * 90 + 45;
+              const laneY = 80 + laneIdx * 115 + 45;
               return (
                 <g key={label}>
                   <line
@@ -600,9 +637,10 @@ function HistoryScrollPage({ onNavigate }: HistoryScrollPageProps) {
               const laneTypes = EVENT_LANES.find(lane => lane.includes(event.type)) || EVENT_LANES[0];
               const laneIdx = EVENT_LANES.indexOf(laneTypes);
               const subIdx = laneTypes.indexOf(event.type);
-              const baseY = 80 + laneIdx * 90;
+              const baseY = 80 + laneIdx * 115;
               const x = YEAR_TO_PX(event.year);
-              const y = baseY + 20 + subIdx * 40;
+              const stackingRow = eventStackingOffsets.get(`${laneIdx}-${event.id}`) || 0;
+              const y = baseY + 20 + subIdx * 40 + stackingRow * 26;
               const isHovered = hoveredEventId === event.id;
               const isSelected = selectedEvent?.id === event.id;
 
@@ -776,7 +814,7 @@ function HistoryScrollPage({ onNavigate }: HistoryScrollPageProps) {
                   {selectedEvent.relatedPainterIds.map(pid => (
                     <Button
                       key={pid}
-                      onClick={() => onNavigate?.('tree')}
+                      onClick={() => onNavigate?.('tree', pid)}
                       style={{ color: '#8b7355', borderColor: '#d4c4a8' }}
                     >
                       👨‍🎨 {getPainterName(pid)}
