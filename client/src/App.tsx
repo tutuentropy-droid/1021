@@ -13,7 +13,8 @@ import {
   ExperimentOutlined,
   EyeInvisibleOutlined,
   NodeIndexOutlined,
-  BgColorsOutlined
+  BgColorsOutlined,
+  EnvironmentOutlined
 } from '@ant-design/icons';
 import type { Stats } from './types';
 import { knowledgeApi } from './api';
@@ -31,10 +32,11 @@ import ExhibitionViewPage from './pages/ExhibitionViewPage';
 import AbsentEntriesPage from './pages/AbsentEntriesPage';
 import GenealogyPage from './pages/GenealogyPage';
 import SilentViewingPage from './pages/SilentViewingPage';
+import GeoImmersionPage from './pages/GeoImmersionPage';
 
 const { Header, Content, Sider, Footer } = Layout;
 
-type PageType = 'home' | 'tree' | 'gallery' | 'flashcards' | 'chat' | 'theories' | 'roleplay' | 'literary' | 'timeline' | 'curator' | 'exhibition' | 'absent' | 'genealogy' | 'silent';
+type PageType = 'home' | 'tree' | 'gallery' | 'flashcards' | 'chat' | 'theories' | 'roleplay' | 'literary' | 'timeline' | 'curator' | 'exhibition' | 'absent' | 'genealogy' | 'silent' | 'geo-immersion';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
@@ -55,6 +57,7 @@ function App() {
   const menuItems = [
     { key: 'home', icon: <BulbOutlined />, label: '首页概览' },
     { key: 'timeline', icon: <FundProjectionScreenOutlined />, label: '画史长卷' },
+    { key: 'geo-immersion', icon: <EnvironmentOutlined />, label: '山河入画' },
     { key: 'genealogy', icon: <NodeIndexOutlined />, label: '程式基因图谱' },
     { key: 'tree', icon: <AppstoreOutlined />, label: '知识树' },
     { key: 'gallery', icon: <PictureOutlined />, label: '画作欣赏' },
@@ -158,6 +161,8 @@ function App() {
         );
       case 'silent':
         return <SilentViewingPage />;
+      case 'geo-immersion':
+        return <GeoImmersionPage onNavigate={handleNavigate} />;
       default:
         return <HomePage stats={stats} onNavigate={handleNavigate} />;
     }

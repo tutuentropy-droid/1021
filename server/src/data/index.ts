@@ -24,6 +24,7 @@ import {
 } from './exhibitions';
 import { getFormulaElements, getFormulaElement } from './formulaGenealogy';
 import { getSilentViewing } from './silentViewing';
+import { getGeoImmersionData, getSchoolGeoComparison, getPainterTravelRoute, getAvailableGeoImmersionPaintings } from './geoImmersion';
 
 export { 
   dynasties, schools, painters, paintings, theories, flashcards, scenarios, readings, literaryWorks, getTimelineData,
@@ -31,5 +32,6 @@ export {
   getThemeSuggestions, createExhibition, updateExhibition, getExhibition, getExhibitionWithPaintings,
   getExhibitionList, deleteExhibition, publishExhibition, getExhibitionByShareCode, getAISuggestions, exhibitions,
   getFormulaElements, getFormulaElement,
-  getSilentViewing
+  getSilentViewing,
+  getGeoImmersionData, getSchoolGeoComparison, getPainterTravelRoute, getAvailableGeoImmersionPaintings
 };

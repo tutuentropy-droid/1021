@@ -5,7 +5,7 @@ import type {
   LiteraryWork, LiteraryWorkType, TimelineData,
   Exhibition, ExhibitionCreateRequest, ExhibitionPreview, ThemeSuggestion, AISuggestion,
   ExhibitionSection, AbsentEntrySummary, AbsentEntryDetail, FormulaElement, FormulaGenealogyData,
-  SilentViewingData
+  SilentViewingData, GeoImmersionPaintingData, SchoolGeoComparison, PainterTravelRoute
 } from './types';
 
 const api = axios.create({
@@ -111,5 +111,17 @@ export const knowledgeApi = {
     api.get<FormulaElement>(`/formula-genealogy/${id}`).then(r => r.data),
 
   getSilentViewing: () =>
-    api.get<SilentViewingData[]>('/silent-viewing').then(r => r.data)
+    api.get<SilentViewingData[]>('/silent-viewing').then(r => r.data),
+
+  getAvailableGeoImmersionPaintings: () =>
+    api.get<{ id: string; title: string; imageUrl: string; theme: string }[]>('/geo-immersion/available').then(r => r.data),
+
+  getGeoImmersionPainting: (paintingId: string) =>
+    api.get<GeoImmersionPaintingData & { painting?: Painting; painter?: Painter }>(`/geo-immersion/paintings/${paintingId}`).then(r => r.data),
+
+  getSchoolGeoComparison: () =>
+    api.get<SchoolGeoComparison>('/geo-immersion/school-comparison').then(r => r.data),
+
+  getPainterTravelRoute: (painterId: string) =>
+    api.get<PainterTravelRoute & { painter?: Painter }>(`/geo-immersion/painters/${painterId}/travel-route`).then(r => r.data)
 };

@@ -498,3 +498,141 @@ export interface SilentViewingData {
   textSource: string;
   viewingHints: string[];
 }
+
+export interface GeoLocation {
+  name: string;
+  ancientName?: string;
+  latitude: number;
+  longitude: number;
+  mapX: number;
+  mapY: number;
+  description?: string;
+}
+
+export interface TerrainLayer {
+  name: string;
+  height: number;
+  color: string;
+  description: string;
+}
+
+export interface TerrainData {
+  id: string;
+  name: string;
+  region: string;
+  centerLocation: GeoLocation;
+  layers: TerrainLayer[];
+  mountainPeaks: { name: string; height: number; description: string }[];
+  waterFeatures: { name: string; type: 'river' | 'stream' | 'waterfall' | 'lake'; description: string }[];
+  climateZones: string[];
+  terrainDescription: string;
+  artisticInfluence: string;
+}
+
+export interface ClimateCondition {
+  timeOfDay: 'dawn' | 'morning' | 'noon' | 'afternoon' | 'dusk' | 'night';
+  season: 'spring' | 'summer' | 'autumn' | 'winter';
+  humidity: number;
+  temperature: number;
+  windSpeed: number;
+  windDirection: string;
+  fogLevel: number;
+  cloudLevel: number;
+  description: string;
+}
+
+export interface AmbientSound {
+  id: string;
+  type: 'wind' | 'stream' | 'waterfall' | 'birds' | 'insects' | 'rain' | 'temple_bell';
+  name: string;
+  description: string;
+  intensity: number;
+  direction?: string;
+}
+
+export interface ClimateSimulation {
+  id: string;
+  paintingId: string;
+  locationName: string;
+  conditions: ClimateCondition[];
+  ambientSounds: AmbientSound[];
+  sensoryDescription: string;
+  recommendedTime: string;
+}
+
+export interface TravelStop {
+  id: string;
+  location: GeoLocation;
+  year?: number;
+  yearDisplay?: string;
+  duration?: string;
+  purpose: string;
+  artisticOutcome: string;
+  relatedWorkIds?: string[];
+  styleTransformation?: string;
+}
+
+export interface PainterTravelRoute {
+  id: string;
+  painterId: string;
+  painterName: string;
+  overview: string;
+  stops: TravelStop[];
+  styleEvolutionPhases: {
+    phaseName: string;
+    period: string;
+    locationInfluence: string;
+    styleCharacteristics: string;
+    representativeWorks: string[];
+  }[];
+}
+
+export interface SchoolGeoComparison {
+  id: string;
+  northSchool: {
+    name: string;
+    region: string;
+    terrainType: string;
+    climateType: string;
+    artisticFeatures: string[];
+    representativePainters: string[];
+    representativePaintings: string[];
+  };
+  southSchool: {
+    name: string;
+    region: string;
+    terrainType: string;
+    climateType: string;
+    artisticFeatures: string[];
+    representativePainters: string[];
+    representativePaintings: string[];
+  };
+  keyDifferences: {
+    aspect: string;
+    north: string;
+    south: string;
+    explanation: string;
+  }[];
+  aiGuide: {
+    opening: string;
+    questions: { id: string; question: string; hint: string }[];
+    conclusion: string;
+  };
+}
+
+export interface GeoImmersionPaintingData {
+  paintingId: string;
+  paintingTitle: string;
+  painterId: string;
+  painterName: string;
+  terrain: TerrainData;
+  climate: ClimateSimulation;
+  northSouthContext?: SchoolGeoComparison;
+  travelRoute?: PainterTravelRoute;
+  immersiveNarrative: {
+    introduction: string;
+    sceneSetup: string;
+    guidedWalkthrough: string[];
+    reflectionPrompts: string[];
+  };
+}

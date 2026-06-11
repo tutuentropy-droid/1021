@@ -3,7 +3,8 @@ import {
   dynasties, schools, painters, paintings, theories, flashcards, scenarios, readings, literaryWorks, getTimelineData,
   getThemeSuggestions, createExhibition, updateExhibition, getExhibition, getExhibitionWithPaintings,
   getExhibitionList, deleteExhibition, publishExhibition, getExhibitionByShareCode, getAISuggestions,
-  absentEntries, getFormulaElements, getFormulaElement, getSilentViewing
+  absentEntries, getFormulaElements, getFormulaElement, getSilentViewing,
+  getGeoImmersionData, getSchoolGeoComparison, getPainterTravelRoute, getAvailableGeoImmersionPaintings
 } from '../data';
 import type { KnowledgeGraph, KnowledgeGraphNode, KnowledgeGraphEdge, ReadingRecommendation, ReadingItem, LiteraryWork, AbsentEntry } from '../types';
 
@@ -1105,6 +1106,41 @@ router.get('/formula-genealogy/:id', (req: Request, res: Response) => {
 router.get('/silent-viewing', (req: Request, res: Response) => {
   const data = getSilentViewing();
   res.json(data);
+});
+
+router.get('/geo-immersion/available', (req: Request, res: Response) => {
+  const available = getAvailableGeoImmersionPaintings();
+  const paintingDetails = available.map(id => {
+    const p = paintings.find(pt => pt.id === id);
+    return p ? { id: p.id, title: p.title, imageUrl: p.imageUrl, theme: p.theme } : null;
+  }).filter(Boolean);
+  res.json(paintingDetails);
+});
+
+router.get('/geo-immersion/paintings/:id', (req: Request, res: Response) => {
+  const data = getGeoImmersionData(req.params.id);
+  if (!data) {
+    res.status(404).json({ error: '该画作暂无沉浸式地理体验数据' });
+    return;
+  }
+  const painting = paintings.find(p => p.id === req.params.id);
+  const painter = data.painterId ? painters.find(p => p.id === data.painterId) : null;
+  res.json({ ...data, painting, painter });
+});
+
+router.get('/geo-immersion/school-comparison', (req: Request, res: Response) => {
+  const comparison = getSchoolGeoComparison();
+  res.json(comparison);
+});
+
+router.get('/geo-immersion/painters/:id/travel-route', (req: Request, res: Response) => {
+  const route = getPainterTravelRoute(req.params.id);
+  if (!route) {
+    res.status(404).json({ error: '该画家暂无游历路线数据' });
+    return;
+  }
+  const painter = painters.find(p => p.id === req.params.id);
+  res.json({ ...route, painter });
 });
 
 export default router;

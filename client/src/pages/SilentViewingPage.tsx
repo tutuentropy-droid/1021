@@ -57,7 +57,7 @@ function SilentViewingPage() {
   }, [showHint, currentItem]);
 
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
+    let timeout: ReturnType<typeof setTimeout>;
     const handleMouseMove = () => {
       setShowUI(true);
       clearTimeout(timeout);
