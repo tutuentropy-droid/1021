@@ -423,3 +423,14 @@ export interface FormulaElement {
     conclusion: string;
   };
 }
+
+export interface SilentViewingData {
+  id: string;
+  paintingId: string;
+  paintingTitle: string;
+  painterName?: string;
+  imageUrl: string;
+  textContent: string;
+  textSource: string;
+  viewingHints: string[];
+}

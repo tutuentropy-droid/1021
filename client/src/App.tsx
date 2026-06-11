@@ -12,7 +12,8 @@ import {
   FundProjectionScreenOutlined,
   ExperimentOutlined,
   EyeInvisibleOutlined,
-  NodeIndexOutlined
+  NodeIndexOutlined,
+  BgColorsOutlined
 } from '@ant-design/icons';
 import type { Stats } from './types';
 import { knowledgeApi } from './api';
@@ -29,10 +30,11 @@ import ExhibitionCuratorPage from './pages/ExhibitionCuratorPage';
 import ExhibitionViewPage from './pages/ExhibitionViewPage';
 import AbsentEntriesPage from './pages/AbsentEntriesPage';
 import GenealogyPage from './pages/GenealogyPage';
+import SilentViewingPage from './pages/SilentViewingPage';
 
 const { Header, Content, Sider, Footer } = Layout;
 
-type PageType = 'home' | 'tree' | 'gallery' | 'flashcards' | 'chat' | 'theories' | 'roleplay' | 'literary' | 'timeline' | 'curator' | 'exhibition' | 'absent' | 'genealogy';
+type PageType = 'home' | 'tree' | 'gallery' | 'flashcards' | 'chat' | 'theories' | 'roleplay' | 'literary' | 'timeline' | 'curator' | 'exhibition' | 'absent' | 'genealogy' | 'silent';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
@@ -62,7 +64,8 @@ function App() {
     { key: 'chat', icon: <MessageOutlined />, label: '对话引导' },
     { key: 'theories', icon: <BookOutlined />, label: '画论典籍' },
     { key: 'roleplay', icon: <ThunderboltOutlined />, label: '画史推演' },
-    { key: 'curator', icon: <ExperimentOutlined />, label: '虚拟策展' }
+    { key: 'curator', icon: <ExperimentOutlined />, label: '虚拟策展' },
+    { key: 'silent', icon: <BgColorsOutlined />, label: '无用之学' }
   ];
 
   const handleNavigate = (page: string, id?: string, extra?: { shareCode?: string }) => {
@@ -153,6 +156,8 @@ function App() {
             onNavigate={handleNavigate}
           />
         );
+      case 'silent':
+        return <SilentViewingPage />;
       default:
         return <HomePage stats={stats} onNavigate={handleNavigate} />;
     }

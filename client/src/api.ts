@@ -4,7 +4,8 @@ import type {
   RoleplayScenario, RoleplayChoice, RoleplayConsequence, RoleplayResult, ReadingRecommendation,
   LiteraryWork, LiteraryWorkType, TimelineData,
   Exhibition, ExhibitionCreateRequest, ExhibitionPreview, ThemeSuggestion, AISuggestion,
-  ExhibitionSection, AbsentEntrySummary, AbsentEntryDetail, FormulaElement, FormulaGenealogyData
+  ExhibitionSection, AbsentEntrySummary, AbsentEntryDetail, FormulaElement, FormulaGenealogyData,
+  SilentViewingData
 } from './types';
 
 const api = axios.create({
@@ -107,5 +108,8 @@ export const knowledgeApi = {
     api.get<FormulaGenealogyData>('/formula-genealogy').then(r => r.data),
 
   getFormulaElement: (id: string) =>
-    api.get<FormulaElement>(`/formula-genealogy/${id}`).then(r => r.data)
+    api.get<FormulaElement>(`/formula-genealogy/${id}`).then(r => r.data),
+
+  getSilentViewing: () =>
+    api.get<SilentViewingData[]>('/silent-viewing').then(r => r.data)
 };

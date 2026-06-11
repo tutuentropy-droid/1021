@@ -487,3 +487,14 @@ export interface FormulaElement {
 export interface FormulaGenealogyData {
   elements: FormulaElement[];
 }
+
+export interface SilentViewingData {
+  id: string;
+  paintingId: string;
+  paintingTitle: string;
+  painterName?: string;
+  imageUrl: string;
+  textContent: string;
+  textSource: string;
+  viewingHints: string[];
+}

@@ -3,7 +3,7 @@ import {
   dynasties, schools, painters, paintings, theories, flashcards, scenarios, readings, literaryWorks, getTimelineData,
   getThemeSuggestions, createExhibition, updateExhibition, getExhibition, getExhibitionWithPaintings,
   getExhibitionList, deleteExhibition, publishExhibition, getExhibitionByShareCode, getAISuggestions,
-  absentEntries, getFormulaElements, getFormulaElement
+  absentEntries, getFormulaElements, getFormulaElement, getSilentViewing
 } from '../data';
 import type { KnowledgeGraph, KnowledgeGraphNode, KnowledgeGraphEdge, ReadingRecommendation, ReadingItem, LiteraryWork, AbsentEntry } from '../types';
 
@@ -1100,6 +1100,11 @@ router.get('/formula-genealogy/:id', (req: Request, res: Response) => {
     return;
   }
   res.json(element);
+});
+
+router.get('/silent-viewing', (req: Request, res: Response) => {
+  const data = getSilentViewing();
+  res.json(data);
 });
 
 export default router;
