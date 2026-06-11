@@ -1,5 +1,9 @@
 import { Router, Request, Response } from 'express';
-import { dynasties, schools, painters, paintings, theories, flashcards, scenarios, readings, literaryWorks, getTimelineData } from '../data';
+import { 
+  dynasties, schools, painters, paintings, theories, flashcards, scenarios, readings, literaryWorks, getTimelineData,
+  getThemeSuggestions, createExhibition, updateExhibition, getExhibition, getExhibitionWithPaintings,
+  getExhibitionList, deleteExhibition, publishExhibition, getExhibitionByShareCode, getAISuggestions
+} from '../data';
 import type { KnowledgeGraph, KnowledgeGraphNode, KnowledgeGraphEdge, ReadingRecommendation, ReadingItem, LiteraryWork } from '../types';
 
 const router = Router();
@@ -855,6 +859,86 @@ router.get('/reading-recommendations', (req: Request, res: Response) => {
   };
 
   res.json(recommendation);
+});
+
+router.get('/exhibition-themes', (req: Request, res: Response) => {
+  const themes = getThemeSuggestions();
+  res.json(themes);
+});
+
+router.get('/exhibitions', (req: Request, res: Response) => {
+  const list = getExhibitionList();
+  res.json(list);
+});
+
+router.get('/exhibitions/:id', (req: Request, res: Response) => {
+  const exhibition = getExhibitionWithPaintings(req.params.id);
+  if (!exhibition) {
+    res.status(404).json({ error: '展览不存在' });
+    return;
+  }
+  res.json(exhibition);
+});
+
+router.post('/exhibitions', (req: Request, res: Response) => {
+  try {
+    const request = req.body as any;
+    if (!request.title || !request.sections) {
+      res.status(400).json({ error: '标题和展线单元为必填项' });
+      return;
+    }
+    const exhibition = createExhibition(request);
+    res.json(exhibition);
+  } catch (e) {
+    res.status(400).json({ error: '创建展览失败' });
+  }
+});
+
+router.put('/exhibitions/:id', (req: Request, res: Response) => {
+  try {
+    const updated = updateExhibition(req.params.id, req.body);
+    if (!updated) {
+      res.status(404).json({ error: '展览不存在' });
+      return;
+    }
+    res.json(updated);
+  } catch (e) {
+    res.status(400).json({ error: '更新展览失败' });
+  }
+});
+
+router.delete('/exhibitions/:id', (req: Request, res: Response) => {
+  const success = deleteExhibition(req.params.id);
+  if (!success) {
+    res.status(404).json({ error: '展览不存在' });
+    return;
+  }
+  res.json({ success: true });
+});
+
+router.post('/exhibitions/:id/publish', (req: Request, res: Response) => {
+  const exhibition = publishExhibition(req.params.id);
+  if (!exhibition) {
+    res.status(404).json({ error: '展览不存在' });
+    return;
+  }
+  res.json(exhibition);
+});
+
+router.get('/exhibitions/share/:code', (req: Request, res: Response) => {
+  const exhibition = getExhibitionByShareCode(req.params.code);
+  if (!exhibition) {
+    res.status(404).json({ error: '分享码无效或展览不存在' });
+    return;
+  }
+  const fullExhibition = getExhibitionWithPaintings(exhibition.id);
+  res.json(fullExhibition);
+});
+
+router.post('/exhibitions/ai-suggestions', (req: Request, res: Response) => {
+  const { sections, title, introduction } = req.body;
+  const suggestions = getAISuggestions(sections || [], title || '', introduction || '');
+  res.json({ suggestions });
 });
 
 export default router;

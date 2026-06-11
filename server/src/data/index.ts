@@ -8,5 +8,22 @@ import { scenarios } from './scenarios';
 import { readings } from './readings';
 import { literaryWorks } from './literaryWorks';
 import { getTimelineData } from './timeline';
+import {
+  getThemeSuggestions,
+  createExhibition,
+  updateExhibition,
+  getExhibition,
+  getExhibitionWithPaintings,
+  getExhibitionList,
+  deleteExhibition,
+  publishExhibition,
+  getExhibitionByShareCode,
+  getAISuggestions,
+  exhibitions
+} from './exhibitions';
 
-export { dynasties, schools, painters, paintings, theories, flashcards, scenarios, readings, literaryWorks, getTimelineData };
+export { 
+  dynasties, schools, painters, paintings, theories, flashcards, scenarios, readings, literaryWorks, getTimelineData,
+  getThemeSuggestions, createExhibition, updateExhibition, getExhibition, getExhibitionWithPaintings,
+  getExhibitionList, deleteExhibition, publishExhibition, getExhibitionByShareCode, getAISuggestions, exhibitions
+};

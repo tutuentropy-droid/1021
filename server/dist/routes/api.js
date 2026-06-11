@@ -806,4 +806,77 @@ router.get('/reading-recommendations', (req, res) => {
     };
     res.json(recommendation);
 });
+router.get('/exhibition-themes', (req, res) => {
+    const themes = (0, data_1.getThemeSuggestions)();
+    res.json(themes);
+});
+router.get('/exhibitions', (req, res) => {
+    const list = (0, data_1.getExhibitionList)();
+    res.json(list);
+});
+router.get('/exhibitions/:id', (req, res) => {
+    const exhibition = (0, data_1.getExhibitionWithPaintings)(req.params.id);
+    if (!exhibition) {
+        res.status(404).json({ error: '展览不存在' });
+        return;
+    }
+    res.json(exhibition);
+});
+router.post('/exhibitions', (req, res) => {
+    try {
+        const request = req.body;
+        if (!request.title || !request.sections) {
+            res.status(400).json({ error: '标题和展线单元为必填项' });
+            return;
+        }
+        const exhibition = (0, data_1.createExhibition)(request);
+        res.json(exhibition);
+    }
+    catch (e) {
+        res.status(400).json({ error: '创建展览失败' });
+    }
+});
+router.put('/exhibitions/:id', (req, res) => {
+    try {
+        const updated = (0, data_1.updateExhibition)(req.params.id, req.body);
+        if (!updated) {
+            res.status(404).json({ error: '展览不存在' });
+            return;
+        }
+        res.json(updated);
+    }
+    catch (e) {
+        res.status(400).json({ error: '更新展览失败' });
+    }
+});
+router.delete('/exhibitions/:id', (req, res) => {
+    const success = (0, data_1.deleteExhibition)(req.params.id);
+    if (!success) {
+        res.status(404).json({ error: '展览不存在' });
+        return;
+    }
+    res.json({ success: true });
+});
+router.post('/exhibitions/:id/publish', (req, res) => {
+    const exhibition = (0, data_1.publishExhibition)(req.params.id);
+    if (!exhibition) {
+        res.status(404).json({ error: '展览不存在' });
+        return;
+    }
+    res.json(exhibition);
+});
+router.get('/exhibitions/share/:code', (req, res) => {
+    const exhibition = (0, data_1.getExhibitionByShareCode)(req.params.code);
+    if (!exhibition) {
+        res.status(404).json({ error: '分享码无效或展览不存在' });
+        return;
+    }
+    const fullExhibition = (0, data_1.getExhibitionWithPaintings)(exhibition.id);
+    res.json(fullExhibition);
+});
+router.post('/exhibitions/ai-suggestions', (req, res) => {
+    const { sections, title, introduction } = req.body;
+    const suggestions = (0, data_1.getAISuggestions)(sections || [], title || '', introduction || '');
+    res.json({ suggestions });
+});
 exports.default = router;

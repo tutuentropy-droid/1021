@@ -269,3 +269,88 @@ export interface TimelineData {
   minYear: number;
   maxYear: number;
 }
+
+export interface ExhibitionItem {
+  paintingId: string;
+  label: string;
+  narration: string;
+  displayOrder: number;
+  painting?: Painting;
+}
+
+export interface ExhibitionSection {
+  id: string;
+  title: string;
+  description: string;
+  items: ExhibitionItem[];
+  displayOrder: number;
+}
+
+export interface Exhibition {
+  id: string;
+  title: string;
+  theme: string;
+  curatorName: string;
+  curatorNote: string;
+  introduction: string;
+  conclusion: string;
+  sections: ExhibitionSection[];
+  createdAt: number;
+  updatedAt: number;
+  isPublished: boolean;
+  shareCode?: string;
+  viewCount: number;
+  coverPaintingId?: string;
+}
+
+export interface AISuggestion {
+  id: string;
+  type: 'theme' | 'selection' | 'label' | 'narration' | 'sequence' | 'fact-check';
+  severity: 'info' | 'warning' | 'error';
+  title: string;
+  description: string;
+  suggestion: string;
+  paintingId?: string;
+  sectionId?: string;
+  reference?: {
+    type: 'painting' | 'painter' | 'dynasty' | 'theory';
+    id: string;
+    name: string;
+  };
+}
+
+export interface ThemeSuggestion {
+  id: string;
+  title: string;
+  description: string;
+  keywords: string[];
+  relatedPaintingIds: string[];
+  curatorialApproach: string;
+  estimatedWorkCount: number;
+}
+
+export interface ExhibitionCreateRequest {
+  title: string;
+  theme: string;
+  curatorName: string;
+  curatorNote: string;
+  introduction: string;
+  conclusion: string;
+  sections: ExhibitionSection[];
+  coverPaintingId?: string;
+}
+
+export interface ExhibitionPreview {
+  id: string;
+  title: string;
+  theme: string;
+  curatorName: string;
+  introduction: string;
+  coverPaintingId?: string;
+  coverImageUrl?: string;
+  artworkCount: number;
+  sectionCount: number;
+  createdAt: number;
+  isPublished: boolean;
+  viewCount: number;
+}

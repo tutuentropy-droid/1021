@@ -9,7 +9,8 @@ import {
   BulbOutlined,
   ThunderboltOutlined,
   EditOutlined,
-  FundProjectionScreenOutlined
+  FundProjectionScreenOutlined,
+  ExperimentOutlined
 } from '@ant-design/icons';
 import type { Stats } from './types';
 import { knowledgeApi } from './api';
@@ -22,10 +23,12 @@ import TheoriesPage from './pages/TheoriesPage';
 import RoleplayPage from './pages/RoleplayPage';
 import LiteraryWorksPage from './pages/LiteraryWorksPage';
 import HistoryScrollPage from './pages/HistoryScrollPage';
+import ExhibitionCuratorPage from './pages/ExhibitionCuratorPage';
+import ExhibitionViewPage from './pages/ExhibitionViewPage';
 
 const { Header, Content, Sider, Footer } = Layout;
 
-type PageType = 'home' | 'tree' | 'gallery' | 'flashcards' | 'chat' | 'theories' | 'roleplay' | 'literary' | 'timeline';
+type PageType = 'home' | 'tree' | 'gallery' | 'flashcards' | 'chat' | 'theories' | 'roleplay' | 'literary' | 'timeline' | 'curator' | 'exhibition';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
@@ -33,6 +36,8 @@ function App() {
   const [treePainterId, setTreePainterId] = useState<string | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [viewingExhibitionId, setViewingExhibitionId] = useState<string | null>(null);
+  const [viewingShareCode, setViewingShareCode] = useState<string | null>(null);
 
   useEffect(() => {
     knowledgeApi.getStats()
@@ -49,16 +54,21 @@ function App() {
     { key: 'flashcards', icon: <FileTextOutlined />, label: '知识抽认卡' },
     { key: 'chat', icon: <MessageOutlined />, label: '对话引导' },
     { key: 'theories', icon: <BookOutlined />, label: '画论典籍' },
-    { key: 'roleplay', icon: <ThunderboltOutlined />, label: '画史推演' }
+    { key: 'roleplay', icon: <ThunderboltOutlined />, label: '画史推演' },
+    { key: 'curator', icon: <ExperimentOutlined />, label: '虚拟策展' }
   ];
 
-  const handleNavigate = (page: string, id?: string) => {
+  const handleNavigate = (page: string, id?: string, extra?: { shareCode?: string }) => {
     setCurrentPage(page as PageType);
     if (page === 'gallery' && id) {
       setGalleryPaintingId(id);
     }
     if (page === 'tree' && id) {
       setTreePainterId(id);
+    }
+    if (page === 'exhibition') {
+      setViewingExhibitionId(id || null);
+      setViewingShareCode(extra?.shareCode || null);
     }
   };
 
@@ -109,6 +119,16 @@ function App() {
         return <LiteraryWorksPage onNavigate={handleNavigate} />;
       case 'timeline':
         return <HistoryScrollPage onNavigate={handleNavigate} />;
+      case 'curator':
+        return <ExhibitionCuratorPage onNavigate={handleNavigate} />;
+      case 'exhibition':
+        return (
+          <ExhibitionViewPage
+            exhibitionId={viewingExhibitionId || undefined}
+            shareCode={viewingShareCode || undefined}
+            onNavigate={handleNavigate}
+          />
+        );
       default:
         return <HomePage stats={stats} onNavigate={handleNavigate} />;
     }

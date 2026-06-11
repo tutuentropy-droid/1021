@@ -2,7 +2,9 @@ import axios from 'axios';
 import type {
   Dynasty, School, Painter, Painting, Theory, Flashcard, TreeNode, Stats, KnowledgeGraph,
   RoleplayScenario, RoleplayChoice, RoleplayConsequence, RoleplayResult, ReadingRecommendation,
-  LiteraryWork, LiteraryWorkType, TimelineData
+  LiteraryWork, LiteraryWorkType, TimelineData,
+  Exhibition, ExhibitionCreateRequest, ExhibitionPreview, ThemeSuggestion, AISuggestion,
+  ExhibitionSection
 } from './types';
 
 const api = axios.create({
@@ -64,5 +66,31 @@ export const knowledgeApi = {
   getPainterLiteraryWorks: (painterId: string) =>
     api.get<LiteraryWork[]>(`/painters/${painterId}/literary-works`).then(r => r.data),
 
-  getTimelineData: () => api.get<TimelineData>('/timeline').then(r => r.data)
+  getTimelineData: () => api.get<TimelineData>('/timeline').then(r => r.data),
+
+  getThemeSuggestions: () => api.get<ThemeSuggestion[]>('/exhibition-themes').then(r => r.data),
+
+  getExhibitions: () => api.get<ExhibitionPreview[]>('/exhibitions').then(r => r.data),
+
+  getExhibition: (id: string) => api.get<Exhibition>(`/exhibitions/${id}`).then(r => r.data),
+
+  createExhibition: (data: ExhibitionCreateRequest) =>
+    api.post<Exhibition>('/exhibitions', data).then(r => r.data),
+
+  updateExhibition: (id: string, data: Partial<ExhibitionCreateRequest>) =>
+    api.put<Exhibition>(`/exhibitions/${id}`, data).then(r => r.data),
+
+  deleteExhibition: (id: string) =>
+    api.delete(`/exhibitions/${id}`).then(r => r.data),
+
+  publishExhibition: (id: string) =>
+    api.post<Exhibition>(`/exhibitions/${id}/publish`).then(r => r.data),
+
+  getExhibitionByShareCode: (code: string) =>
+    api.get<Exhibition>(`/exhibitions/share/${code}`).then(r => r.data),
+
+  getAISuggestions: (sections: ExhibitionSection[], title: string, introduction: string) =>
+    api.post<{ suggestions: AISuggestion[] }>('/exhibitions/ai-suggestions', {
+      sections, title, introduction
+    }).then(r => r.data.suggestions)
 };
