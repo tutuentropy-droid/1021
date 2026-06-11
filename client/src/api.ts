@@ -2,7 +2,7 @@ import axios from 'axios';
 import type {
   Dynasty, School, Painter, Painting, Theory, Flashcard, TreeNode, Stats, KnowledgeGraph,
   RoleplayScenario, RoleplayChoice, RoleplayConsequence, RoleplayResult, ReadingRecommendation,
-  LiteraryWork, LiteraryWorkType
+  LiteraryWork, LiteraryWorkType, TimelineData
 } from './types';
 
 const api = axios.create({
@@ -62,5 +62,7 @@ export const knowledgeApi = {
     api.get<LiteraryWork[]>(`/paintings/${paintingId}/literary-works`).then(r => r.data),
 
   getPainterLiteraryWorks: (painterId: string) =>
-    api.get<LiteraryWork[]>(`/painters/${painterId}/literary-works`).then(r => r.data)
+    api.get<LiteraryWork[]>(`/painters/${painterId}/literary-works`).then(r => r.data),
+
+  getTimelineData: () => api.get<TimelineData>('/timeline').then(r => r.data)
 };

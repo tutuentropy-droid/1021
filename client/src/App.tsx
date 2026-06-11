@@ -8,7 +8,8 @@ import {
   MessageOutlined,
   BulbOutlined,
   ThunderboltOutlined,
-  EditOutlined
+  EditOutlined,
+  FundProjectionScreenOutlined
 } from '@ant-design/icons';
 import type { Stats } from './types';
 import { knowledgeApi } from './api';
@@ -20,10 +21,11 @@ import ChatGuidePage from './pages/ChatGuidePage';
 import TheoriesPage from './pages/TheoriesPage';
 import RoleplayPage from './pages/RoleplayPage';
 import LiteraryWorksPage from './pages/LiteraryWorksPage';
+import HistoryScrollPage from './pages/HistoryScrollPage';
 
 const { Header, Content, Sider, Footer } = Layout;
 
-type PageType = 'home' | 'tree' | 'gallery' | 'flashcards' | 'chat' | 'theories' | 'roleplay' | 'literary';
+type PageType = 'home' | 'tree' | 'gallery' | 'flashcards' | 'chat' | 'theories' | 'roleplay' | 'literary' | 'timeline';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
@@ -39,6 +41,7 @@ function App() {
 
   const menuItems = [
     { key: 'home', icon: <BulbOutlined />, label: '首页概览' },
+    { key: 'timeline', icon: <FundProjectionScreenOutlined />, label: '画史长卷' },
     { key: 'tree', icon: <AppstoreOutlined />, label: '知识树' },
     { key: 'gallery', icon: <PictureOutlined />, label: '画作欣赏' },
     { key: 'literary', icon: <EditOutlined />, label: '诗文雅集' },
@@ -90,6 +93,8 @@ function App() {
         return <RoleplayPage />;
       case 'literary':
         return <LiteraryWorksPage onNavigate={handleNavigate} />;
+      case 'timeline':
+        return <HistoryScrollPage onNavigate={handleNavigate} />;
       default:
         return <HomePage stats={stats} onNavigate={handleNavigate} />;
     }

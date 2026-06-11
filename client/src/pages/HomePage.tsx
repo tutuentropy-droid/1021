@@ -6,7 +6,8 @@ import {
   MessageOutlined,
   BookOutlined,
   ArrowRightOutlined,
-  BulbOutlined
+  BulbOutlined,
+  FundProjectionScreenOutlined
 } from '@ant-design/icons';
 import type { Stats } from '../types';
 
@@ -28,6 +29,13 @@ function HomePage({ stats, onNavigate }: HomePageProps) {
   }
 
   const features = [
+    {
+      icon: <FundProjectionScreenOutlined style={{ fontSize: 40, color: '#8b7355' }} />,
+      title: '画史长卷',
+      desc: '以时间为骨架、空间为肌理的立体长卷，宏观微观一键切换，一览千年画史流变',
+      page: 'timeline',
+      color: '#fdfbf3'
+    },
     {
       icon: <AppstoreOutlined style={{ fontSize: 40, color: '#8b7355' }} />,
       title: '知识树导航',
@@ -141,7 +149,7 @@ function HomePage({ stats, onNavigate }: HomePageProps) {
       </Row>
 
       <Title level={3} className="ink-title" style={{ marginBottom: 24 }}>
-        探索中国画的五大路径
+        探索中国画的六大路径
       </Title>
 
       <Row gutter={[16, 16]}>

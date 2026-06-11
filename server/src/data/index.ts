@@ -7,5 +7,6 @@ import { flashcards } from './flashcards';
 import { scenarios } from './scenarios';
 import { readings } from './readings';
 import { literaryWorks } from './literaryWorks';
+import { getTimelineData } from './timeline';
 
-export { dynasties, schools, painters, paintings, theories, flashcards, scenarios, readings, literaryWorks };
+export { dynasties, schools, painters, paintings, theories, flashcards, scenarios, readings, literaryWorks, getTimelineData };

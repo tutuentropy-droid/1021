@@ -173,6 +173,10 @@ router.get('/stats', (req, res) => {
         literaryWorks: data_1.literaryWorks.length
     });
 });
+router.get('/timeline', (req, res) => {
+    const timelineData = (0, data_1.getTimelineData)();
+    res.json(timelineData);
+});
 router.get('/search', (req, res) => {
     const { q } = req.query;
     if (!q) {

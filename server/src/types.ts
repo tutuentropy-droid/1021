@@ -221,3 +221,51 @@ export interface ReadingRecommendation {
   items: ReadingItem[];
   intro: string;
 }
+
+export type TimelineEventType =
+  | 'painter_birth'
+  | 'painter_death'
+  | 'painting_created'
+  | 'school_founded'
+  | 'theory_published'
+  | 'literary_work'
+  | 'friendship'
+  | 'historical_event'
+  | 'philosophy_event';
+
+export interface TimelineEvent {
+  id: string;
+  type: TimelineEventType;
+  year: number;
+  yearDisplay: string;
+  title: string;
+  description: string;
+  dynastyId: string;
+  relatedPainterIds?: string[];
+  relatedPaintingIds?: string[];
+  relatedSchoolIds?: string[];
+  relatedTheoryIds?: string[];
+  location?: {
+    name: string;
+    x: number;
+    y: number;
+  };
+  metadata?: Record<string, any>;
+}
+
+export interface TimelineRegion {
+  id: string;
+  name: string;
+  startYear: number;
+  endYear: number;
+  color: string;
+  description?: string;
+  events: TimelineEvent[];
+}
+
+export interface TimelineData {
+  regions: TimelineRegion[];
+  allEvents: TimelineEvent[];
+  minYear: number;
+  maxYear: number;
+}

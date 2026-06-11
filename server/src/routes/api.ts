@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { dynasties, schools, painters, paintings, theories, flashcards, scenarios, readings, literaryWorks } from '../data';
+import { dynasties, schools, painters, paintings, theories, flashcards, scenarios, readings, literaryWorks, getTimelineData } from '../data';
 import type { KnowledgeGraph, KnowledgeGraphNode, KnowledgeGraphEdge, ReadingRecommendation, ReadingItem, LiteraryWork } from '../types';
 
 const router = Router();
@@ -192,6 +192,11 @@ router.get('/stats', (req: Request, res: Response) => {
     flashcards: flashcards.length,
     literaryWorks: literaryWorks.length
   });
+});
+
+router.get('/timeline', (req: Request, res: Response) => {
+  const timelineData = getTimelineData();
+  res.json(timelineData);
 });
 
 router.get('/search', (req: Request, res: Response) => {
