@@ -189,7 +189,8 @@ router.get('/stats', (req: Request, res: Response) => {
     painters: painters.length,
     paintings: paintings.length,
     theories: theories.length,
-    flashcards: flashcards.length
+    flashcards: flashcards.length,
+    literaryWorks: literaryWorks.length
   });
 });
 

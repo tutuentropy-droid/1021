@@ -7,7 +7,8 @@ import {
   FileTextOutlined,
   MessageOutlined,
   BulbOutlined,
-  ThunderboltOutlined
+  ThunderboltOutlined,
+  EditOutlined
 } from '@ant-design/icons';
 import type { Stats } from './types';
 import { knowledgeApi } from './api';
@@ -18,10 +19,11 @@ import FlashcardsPage from './pages/FlashcardsPage';
 import ChatGuidePage from './pages/ChatGuidePage';
 import TheoriesPage from './pages/TheoriesPage';
 import RoleplayPage from './pages/RoleplayPage';
+import LiteraryWorksPage from './pages/LiteraryWorksPage';
 
 const { Header, Content, Sider, Footer } = Layout;
 
-type PageType = 'home' | 'tree' | 'gallery' | 'flashcards' | 'chat' | 'theories' | 'roleplay';
+type PageType = 'home' | 'tree' | 'gallery' | 'flashcards' | 'chat' | 'theories' | 'roleplay' | 'literary';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
@@ -39,6 +41,7 @@ function App() {
     { key: 'home', icon: <BulbOutlined />, label: '首页概览' },
     { key: 'tree', icon: <AppstoreOutlined />, label: '知识树' },
     { key: 'gallery', icon: <PictureOutlined />, label: '画作欣赏' },
+    { key: 'literary', icon: <EditOutlined />, label: '诗文雅集' },
     { key: 'flashcards', icon: <FileTextOutlined />, label: '知识抽认卡' },
     { key: 'chat', icon: <MessageOutlined />, label: '对话引导' },
     { key: 'theories', icon: <BookOutlined />, label: '画论典籍' },
@@ -85,6 +88,8 @@ function App() {
         return <TheoriesPage />;
       case 'roleplay':
         return <RoleplayPage />;
+      case 'literary':
+        return <LiteraryWorksPage onNavigate={handleNavigate} />;
       default:
         return <HomePage stats={stats} onNavigate={handleNavigate} />;
     }
@@ -121,7 +126,7 @@ function App() {
           画脉通识 · 让中国画的千年文脉，如知识之树在心中生长
         </div>
         <div style={{ marginTop: 8, fontSize: 12, color: '#a89880' }}>
-          {stats && `共收录 ${stats.dynasties} 个朝代 · ${stats.schools} 个画派 · ${stats.painters} 位画家 · ${stats.paintings} 幅名作 · ${stats.theories} 部画论 · ${stats.flashcards} 张抽认卡`}
+          {stats && `共收录 ${stats.dynasties} 个朝代 · ${stats.schools} 个画派 · ${stats.painters} 位画家 · ${stats.paintings} 幅名作 · ${stats.theories} 部画论 · ${stats.literaryWorks} 篇诗文 · ${stats.flashcards} 张抽认卡`}
         </div>
       </Footer>
     </Layout>

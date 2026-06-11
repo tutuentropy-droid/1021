@@ -140,6 +140,7 @@ export interface Stats {
   paintings: number;
   theories: number;
   flashcards: number;
+  literaryWorks: number;
 }
 
 export interface ChatMessage {

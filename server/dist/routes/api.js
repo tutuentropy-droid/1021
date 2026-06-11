@@ -169,7 +169,8 @@ router.get('/stats', (req, res) => {
         painters: data_1.painters.length,
         paintings: data_1.paintings.length,
         theories: data_1.theories.length,
-        flashcards: data_1.flashcards.length
+        flashcards: data_1.flashcards.length,
+        literaryWorks: data_1.literaryWorks.length
     });
 });
 router.get('/search', (req, res) => {
