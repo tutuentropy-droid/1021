@@ -11,7 +11,8 @@ import {
   EditOutlined,
   FundProjectionScreenOutlined,
   ExperimentOutlined,
-  EyeInvisibleOutlined
+  EyeInvisibleOutlined,
+  NodeIndexOutlined
 } from '@ant-design/icons';
 import type { Stats } from './types';
 import { knowledgeApi } from './api';
@@ -27,10 +28,11 @@ import HistoryScrollPage from './pages/HistoryScrollPage';
 import ExhibitionCuratorPage from './pages/ExhibitionCuratorPage';
 import ExhibitionViewPage from './pages/ExhibitionViewPage';
 import AbsentEntriesPage from './pages/AbsentEntriesPage';
+import GenealogyPage from './pages/GenealogyPage';
 
 const { Header, Content, Sider, Footer } = Layout;
 
-type PageType = 'home' | 'tree' | 'gallery' | 'flashcards' | 'chat' | 'theories' | 'roleplay' | 'literary' | 'timeline' | 'curator' | 'exhibition' | 'absent';
+type PageType = 'home' | 'tree' | 'gallery' | 'flashcards' | 'chat' | 'theories' | 'roleplay' | 'literary' | 'timeline' | 'curator' | 'exhibition' | 'absent' | 'genealogy';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
@@ -51,6 +53,7 @@ function App() {
   const menuItems = [
     { key: 'home', icon: <BulbOutlined />, label: '首页概览' },
     { key: 'timeline', icon: <FundProjectionScreenOutlined />, label: '画史长卷' },
+    { key: 'genealogy', icon: <NodeIndexOutlined />, label: '程式基因图谱' },
     { key: 'tree', icon: <AppstoreOutlined />, label: '知识树' },
     { key: 'gallery', icon: <PictureOutlined />, label: '画作欣赏' },
     { key: 'absent', icon: <EyeInvisibleOutlined />, label: '阙如录' },
@@ -130,6 +133,8 @@ function App() {
         return <LiteraryWorksPage onNavigate={handleNavigate} />;
       case 'timeline':
         return <HistoryScrollPage onNavigate={handleNavigate} />;
+      case 'genealogy':
+        return <GenealogyPage onNavigate={handleNavigate} />;
       case 'curator':
         return <ExhibitionCuratorPage onNavigate={handleNavigate} />;
       case 'absent':

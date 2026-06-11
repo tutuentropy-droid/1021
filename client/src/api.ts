@@ -4,7 +4,7 @@ import type {
   RoleplayScenario, RoleplayChoice, RoleplayConsequence, RoleplayResult, ReadingRecommendation,
   LiteraryWork, LiteraryWorkType, TimelineData,
   Exhibition, ExhibitionCreateRequest, ExhibitionPreview, ThemeSuggestion, AISuggestion,
-  ExhibitionSection, AbsentEntrySummary, AbsentEntryDetail
+  ExhibitionSection, AbsentEntrySummary, AbsentEntryDetail, FormulaElement, FormulaGenealogyData
 } from './types';
 
 const api = axios.create({
@@ -101,5 +101,11 @@ export const knowledgeApi = {
   getAISuggestions: (sections: ExhibitionSection[], title: string, introduction: string) =>
     api.post<{ suggestions: AISuggestion[] }>('/exhibitions/ai-suggestions', {
       sections, title, introduction
-    }).then(r => r.data.suggestions)
+    }).then(r => r.data.suggestions),
+
+  getFormulaGenealogy: () =>
+    api.get<FormulaGenealogyData>('/formula-genealogy').then(r => r.data),
+
+  getFormulaElement: (id: string) =>
+    api.get<FormulaElement>(`/formula-genealogy/${id}`).then(r => r.data)
 };

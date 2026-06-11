@@ -170,8 +170,62 @@ router.get('/stats', (req, res) => {
         paintings: data_1.paintings.length,
         theories: data_1.theories.length,
         flashcards: data_1.flashcards.length,
-        literaryWorks: data_1.literaryWorks.length
+        literaryWorks: data_1.literaryWorks.length,
+        absentEntries: data_1.absentEntries.length
     });
+});
+router.get('/absent-entries', (req, res) => {
+    const { dynastyId, type, status, painterId } = req.query;
+    let result = data_1.absentEntries;
+    if (dynastyId) {
+        result = result.filter(a => a.dynastyId === dynastyId);
+    }
+    if (type) {
+        result = result.filter(a => a.type === type);
+    }
+    if (status) {
+        result = result.filter(a => a.status === status);
+    }
+    if (painterId) {
+        result = result.filter(a => a.attributedPainterId === painterId);
+    }
+    res.json(result.map(e => ({
+        id: e.id,
+        type: e.type,
+        name: e.name,
+        dynastyId: e.dynastyId,
+        attributedPainterId: e.attributedPainterId,
+        status: e.status,
+        description: e.description,
+        whatWasLost: e.whatWasLost,
+        sourceCount: e.sources.length,
+        relatedExistingPaintingIds: e.relatedExistingPaintingIds,
+        relatedExistingPainterIds: e.relatedExistingPainterIds
+    })));
+});
+router.get('/absent-entries/:id', (req, res) => {
+    const entry = data_1.absentEntries.find(a => a.id === req.params.id);
+    if (!entry) {
+        res.status(404).json({ error: '空白条目不存在' });
+        return;
+    }
+    const dynasty = data_1.dynasties.find(d => d.id === entry.dynastyId);
+    const attributedPainter = entry.attributedPainterId
+        ? data_1.painters.find(p => p.id === entry.attributedPainterId)
+        : null;
+    const relatedPaintings = entry.relatedExistingPaintingIds
+        ? data_1.paintings.filter(p => entry.relatedExistingPaintingIds.includes(p.id))
+        : [];
+    res.json({ ...entry, dynasty, attributedPainter, relatedPaintings });
+});
+router.get('/painters/:id/absent-entries', (req, res) => {
+    const painter = data_1.painters.find(p => p.id === req.params.id);
+    if (!painter) {
+        res.status(404).json({ error: '画家不存在' });
+        return;
+    }
+    const entries = data_1.absentEntries.filter(a => a.attributedPainterId === req.params.id);
+    res.json(entries);
 });
 router.get('/timeline', (req, res) => {
     const timelineData = (0, data_1.getTimelineData)();
@@ -222,8 +276,9 @@ router.get('/paintings/:id/deep-analysis', (req, res) => {
     });
 });
 router.get('/knowledge-graph', (req, res) => {
-    const { painterId, schoolId, paintingId, depth } = req.query;
+    const { painterId, schoolId, paintingId, depth, includeAbsent } = req.query;
     const graphDepth = parseInt(depth || '2');
+    const shouldIncludeAbsent = includeAbsent !== 'false';
     const nodes = new Map();
     const edges = [];
     const addPainterNode = (painterId) => {
@@ -276,6 +331,25 @@ router.get('/knowledge-graph', (req, res) => {
                 type: 'dynasty',
                 name: dynasty.name,
                 description: dynasty.period
+            });
+        }
+    };
+    const addAbsentNode = (absentId) => {
+        if (nodes.has(absentId))
+            return;
+        const absent = data_1.absentEntries.find(a => a.id === absentId);
+        if (absent) {
+            nodes.set(absentId, {
+                id: absentId,
+                type: 'absent_' + absent.type,
+                name: absent.name,
+                description: absent.whatWasLost,
+                metadata: {
+                    isAbsent: true,
+                    absentType: absent.type,
+                    status: absent.status,
+                    sourceCount: absent.sources.length
+                }
             });
         }
     };
@@ -410,12 +484,48 @@ router.get('/knowledge-graph', (req, res) => {
     };
     if (painterId) {
         buildFromPainter(painterId, 0);
+        if (shouldIncludeAbsent) {
+            data_1.absentEntries
+                .filter(a => a.attributedPainterId === painterId)
+                .forEach(absent => {
+                addAbsentNode(absent.id);
+                edges.push({
+                    id: `painter-absent-${painterId}-${absent.id}`,
+                    source: painterId,
+                    target: absent.id,
+                    type: 'absent_record',
+                    label: '真迹失传'
+                });
+                addDynastyNode(absent.dynastyId);
+                edges.push({
+                    id: `absent-dynasty-${absent.id}-${absent.dynastyId}`,
+                    source: absent.id,
+                    target: absent.dynastyId,
+                    type: 'belongsTo',
+                    label: '所属时代'
+                });
+            });
+        }
     }
     else if (schoolId) {
         buildFromSchool(schoolId);
     }
     else if (paintingId) {
         buildFromPainting(paintingId);
+        if (shouldIncludeAbsent) {
+            data_1.absentEntries
+                .filter(a => a.relatedExistingPaintingIds?.includes(paintingId))
+                .forEach(absent => {
+                addAbsentNode(absent.id);
+                edges.push({
+                    id: `painting-absent-ref-${paintingId}-${absent.id}`,
+                    source: paintingId,
+                    target: absent.id,
+                    type: 'absent_reference',
+                    label: '可作参照'
+                });
+            });
+        }
     }
     else {
         data_1.painters.forEach(p => {
@@ -424,6 +534,39 @@ router.get('/knowledge-graph', (req, res) => {
             }
         });
         data_1.schools.forEach(s => buildFromSchool(s.id));
+        if (shouldIncludeAbsent) {
+            data_1.absentEntries.forEach(absent => {
+                addAbsentNode(absent.id);
+                addDynastyNode(absent.dynastyId);
+                edges.push({
+                    id: `absent-dynasty-${absent.id}-${absent.dynastyId}`,
+                    source: absent.id,
+                    target: absent.dynastyId,
+                    type: 'belongsTo',
+                    label: '所属时代'
+                });
+                if (absent.attributedPainterId) {
+                    addPainterNode(absent.attributedPainterId);
+                    edges.push({
+                        id: `painter-absent-${absent.attributedPainterId}-${absent.id}`,
+                        source: absent.attributedPainterId,
+                        target: absent.id,
+                        type: 'absent_record',
+                        label: '真迹失传'
+                    });
+                }
+                absent.relatedExistingPaintingIds?.forEach(pid => {
+                    addPaintingNode(pid);
+                    edges.push({
+                        id: `absent-painting-ref-${absent.id}-${pid}`,
+                        source: absent.id,
+                        target: pid,
+                        type: 'absent_reference',
+                        label: '传世参照'
+                    });
+                });
+            });
+        }
     }
     res.json({
         nodes: Array.from(nodes.values()),

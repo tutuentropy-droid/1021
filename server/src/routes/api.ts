@@ -3,7 +3,7 @@ import {
   dynasties, schools, painters, paintings, theories, flashcards, scenarios, readings, literaryWorks, getTimelineData,
   getThemeSuggestions, createExhibition, updateExhibition, getExhibition, getExhibitionWithPaintings,
   getExhibitionList, deleteExhibition, publishExhibition, getExhibitionByShareCode, getAISuggestions,
-  absentEntries
+  absentEntries, getFormulaElements, getFormulaElement
 } from '../data';
 import type { KnowledgeGraph, KnowledgeGraphNode, KnowledgeGraphEdge, ReadingRecommendation, ReadingItem, LiteraryWork, AbsentEntry } from '../types';
 
@@ -1086,6 +1086,20 @@ router.post('/exhibitions/ai-suggestions', (req: Request, res: Response) => {
   const { sections, title, introduction } = req.body;
   const suggestions = getAISuggestions(sections || [], title || '', introduction || '');
   res.json({ suggestions });
+});
+
+router.get('/formula-genealogy', (req: Request, res: Response) => {
+  const elements = getFormulaElements();
+  res.json({ elements });
+});
+
+router.get('/formula-genealogy/:id', (req: Request, res: Response) => {
+  const element = getFormulaElement(req.params.id);
+  if (!element) {
+    res.status(404).json({ error: '程式元素不存在' });
+    return;
+  }
+  res.json(element);
 });
 
 export default router;

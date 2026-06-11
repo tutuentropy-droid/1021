@@ -22,10 +22,12 @@ import {
   getAISuggestions,
   exhibitions
 } from './exhibitions';
+import { getFormulaElements, getFormulaElement } from './formulaGenealogy';
 
 export { 
   dynasties, schools, painters, paintings, theories, flashcards, scenarios, readings, literaryWorks, getTimelineData,
   absentEntries,
   getThemeSuggestions, createExhibition, updateExhibition, getExhibition, getExhibitionWithPaintings,
-  getExhibitionList, deleteExhibition, publishExhibition, getExhibitionByShareCode, getAISuggestions, exhibitions
+  getExhibitionList, deleteExhibition, publishExhibition, getExhibitionByShareCode, getAISuggestions, exhibitions,
+  getFormulaElements, getFormulaElement
 };

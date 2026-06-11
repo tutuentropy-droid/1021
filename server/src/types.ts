@@ -385,3 +385,41 @@ export interface AbsentEntry {
   relatedExistingPainterIds?: string[];
   scholarlyDebate?: string;
 }
+
+export type FormulaCategory = 'cun' | 'dianye' | 'miao' | 'dianshui' | 'ran';
+
+export interface FormulaVariant {
+  id: string;
+  year: number;
+  yearDisplay: string;
+  dynastyId: string;
+  painterId?: string;
+  painterName: string;
+  paintingId?: string;
+  paintingTitle?: string;
+  name: string;
+  description: string;
+  techniqueDescription: string;
+  visualPrompt: string;
+  personalPursuit: string;
+  eraPressure: string;
+  transformation: string;
+  keyFeatures: string[];
+}
+
+export interface FormulaElement {
+  id: string;
+  category: FormulaCategory;
+  categoryName: string;
+  name: string;
+  alias: string[];
+  origin: string;
+  definition: string;
+  culturalContext: string;
+  variants: FormulaVariant[];
+  aiGuide: {
+    opening: string;
+    questions: { id: string; question: string; hint: string }[];
+    conclusion: string;
+  };
+}
