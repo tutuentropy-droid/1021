@@ -14,7 +14,8 @@ import {
   EyeInvisibleOutlined,
   NodeIndexOutlined,
   BgColorsOutlined,
-  EnvironmentOutlined
+  EnvironmentOutlined,
+  CompassOutlined
 } from '@ant-design/icons';
 import type { Stats } from './types';
 import { knowledgeApi } from './api';
@@ -33,10 +34,11 @@ import AbsentEntriesPage from './pages/AbsentEntriesPage';
 import GenealogyPage from './pages/GenealogyPage';
 import SilentViewingPage from './pages/SilentViewingPage';
 import GeoImmersionPage from './pages/GeoImmersionPage';
+import LearningPathPage from './pages/LearningPathPage';
 
 const { Header, Content, Sider, Footer } = Layout;
 
-type PageType = 'home' | 'tree' | 'gallery' | 'flashcards' | 'chat' | 'theories' | 'roleplay' | 'literary' | 'timeline' | 'curator' | 'exhibition' | 'absent' | 'genealogy' | 'silent' | 'geo-immersion';
+type PageType = 'home' | 'tree' | 'gallery' | 'flashcards' | 'chat' | 'theories' | 'roleplay' | 'literary' | 'timeline' | 'curator' | 'exhibition' | 'absent' | 'genealogy' | 'silent' | 'geo-immersion' | 'learning-path';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
@@ -66,6 +68,7 @@ function App() {
     { key: 'flashcards', icon: <FileTextOutlined />, label: '知识抽认卡' },
     { key: 'chat', icon: <MessageOutlined />, label: '对话引导' },
     { key: 'theories', icon: <BookOutlined />, label: '画论典籍' },
+    { key: 'learning-path', icon: <CompassOutlined />, label: '师古之路' },
     { key: 'roleplay', icon: <ThunderboltOutlined />, label: '画史推演' },
     { key: 'curator', icon: <ExperimentOutlined />, label: '虚拟策展' },
     { key: 'silent', icon: <BgColorsOutlined />, label: '无用之学' }
@@ -163,6 +166,8 @@ function App() {
         return <SilentViewingPage />;
       case 'geo-immersion':
         return <GeoImmersionPage onNavigate={handleNavigate} />;
+      case 'learning-path':
+        return <LearningPathPage onNavigate={handleNavigate} />;
       default:
         return <HomePage stats={stats} onNavigate={handleNavigate} />;
     }

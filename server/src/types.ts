@@ -572,3 +572,55 @@ export interface GeoImmersionPaintingData {
     reflectionPrompts: string[];
   };
 }
+
+export type LearningPathType = 'xiehe' | 'zhangyanyuan' | 'guoxi' | 'dongqichang';
+
+export interface PathStep {
+  id: string;
+  order: number;
+  title: string;
+  subtitle: string;
+  type: 'painting' | 'theory' | 'painter' | 'school' | 'reflection';
+  relatedIds?: string[];
+  content: string;
+  keyInsights: string[];
+  practiceExercise?: string;
+  duration?: string;
+  imageUrl?: string;
+}
+
+export interface PathPhase {
+  id: string;
+  name: string;
+  description: string;
+  steps: PathStep[];
+}
+
+export interface LearningPath {
+  id: string;
+  theoristName: string;
+  courtesyName?: string;
+  dynasty: string;
+  era: string;
+  title: string;
+  subtitle: string;
+  coverEmoji: string;
+  description: string;
+  corePhilosophy: string;
+  historicalContext: string;
+  methodology: string;
+  phases: PathPhase[];
+  aiGuide: {
+    introduction: string;
+    midwayReflection: string;
+    conclusion: string;
+    designLogic: string;
+    limitations: string;
+    comparisonWithOthers: string;
+  };
+  relatedTheoryId?: string;
+  representativeWorks: string[];
+  totalSteps: number;
+  estimatedTime: string;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+}

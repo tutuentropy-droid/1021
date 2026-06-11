@@ -5,7 +5,8 @@ import type {
   LiteraryWork, LiteraryWorkType, TimelineData,
   Exhibition, ExhibitionCreateRequest, ExhibitionPreview, ThemeSuggestion, AISuggestion,
   ExhibitionSection, AbsentEntrySummary, AbsentEntryDetail, FormulaElement, FormulaGenealogyData,
-  SilentViewingData, GeoImmersionPaintingData, SchoolGeoComparison, PainterTravelRoute
+  SilentViewingData, GeoImmersionPaintingData, SchoolGeoComparison, PainterTravelRoute,
+  LearningPath
 } from './types';
 
 const api = axios.create({
@@ -123,5 +124,11 @@ export const knowledgeApi = {
     api.get<SchoolGeoComparison>('/geo-immersion/school-comparison').then(r => r.data),
 
   getPainterTravelRoute: (painterId: string) =>
-    api.get<PainterTravelRoute & { painter?: Painter }>(`/geo-immersion/painters/${painterId}/travel-route`).then(r => r.data)
+    api.get<PainterTravelRoute & { painter?: Painter }>(`/geo-immersion/painters/${painterId}/travel-route`).then(r => r.data),
+
+  getLearningPaths: () =>
+    api.get<any[]>('/learning-paths').then(r => r.data),
+
+  getLearningPath: (id: string) =>
+    api.get<LearningPath>(`/learning-paths/${id}`).then(r => r.data)
 };

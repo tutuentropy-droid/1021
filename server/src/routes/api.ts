@@ -4,7 +4,8 @@ import {
   getThemeSuggestions, createExhibition, updateExhibition, getExhibition, getExhibitionWithPaintings,
   getExhibitionList, deleteExhibition, publishExhibition, getExhibitionByShareCode, getAISuggestions,
   absentEntries, getFormulaElements, getFormulaElement, getSilentViewing,
-  getGeoImmersionData, getSchoolGeoComparison, getPainterTravelRoute, getAvailableGeoImmersionPaintings
+  getGeoImmersionData, getSchoolGeoComparison, getPainterTravelRoute, getAvailableGeoImmersionPaintings,
+  getLearningPaths, getLearningPath
 } from '../data';
 import type { KnowledgeGraph, KnowledgeGraphNode, KnowledgeGraphEdge, ReadingRecommendation, ReadingItem, LiteraryWork, AbsentEntry } from '../types';
 
@@ -1141,6 +1142,38 @@ router.get('/geo-immersion/painters/:id/travel-route', (req: Request, res: Respo
   }
   const painter = painters.find(p => p.id === req.params.id);
   res.json({ ...route, painter });
+});
+
+router.get('/learning-paths', (req: Request, res: Response) => {
+  const paths = getLearningPaths();
+  const summary = paths.map(p => ({
+    id: p.id,
+    theoristName: p.theoristName,
+    courtesyName: p.courtesyName,
+    dynasty: p.dynasty,
+    era: p.era,
+    title: p.title,
+    subtitle: p.subtitle,
+    coverEmoji: p.coverEmoji,
+    description: p.description,
+    corePhilosophy: p.corePhilosophy,
+    totalSteps: p.totalSteps,
+    estimatedTime: p.estimatedTime,
+    difficulty: p.difficulty,
+    representativeWorks: p.representativeWorks,
+    relatedTheoryId: p.relatedTheoryId,
+    phaseCount: p.phases.length
+  }));
+  res.json(summary);
+});
+
+router.get('/learning-paths/:id', (req: Request, res: Response) => {
+  const path = getLearningPath(req.params.id);
+  if (!path) {
+    res.status(404).json({ error: '学习路径不存在' });
+    return;
+  }
+  res.json(path);
 });
 
 export default router;
